@@ -17,6 +17,7 @@ import Sobre from "./pages/Sobre";
 import Termos from "./pages/Termos";
 import Privacidade from "./pages/Privacidade";
 import Contato from "./pages/Contato";
+import TesteCadastro from "./pages/TesteCadastro";
 import NotFound from "./pages/NotFound";
 
 const App: React.FC = () => {
@@ -40,6 +41,7 @@ const App: React.FC = () => {
         <Route path="/termos" element={<Termos />} />
         <Route path="/privacidade" element={<Privacidade />} />
         <Route path="/contato" element={<Contato />} />
+        <Route path="/teste-cadastro" element={<TesteCadastro />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>

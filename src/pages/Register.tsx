@@ -112,8 +112,7 @@ const Register = () => {
         phone: formData.phone,
         address: formData.address,
         user_type: 'cliente',
-        role: 'cliente',
-        email_confirmed_at: new Date().toISOString()
+        role: 'cliente'
       };
 
       console.log("Criando perfil:", profileData);
@@ -127,7 +126,11 @@ const Register = () => {
         showError("Erro ao salvar seus dados. Tente novamente.");
         
         // Tentar deletar o usuário criado para não deixar conta órfã
-        await supabase.auth.admin.deleteUser(authData.user.id);
+        try {
+          await supabase.auth.admin.deleteUser(authData.user.id);
+        } catch (deleteError) {
+          console.error("Erro ao deletar usuário:", deleteError);
+        }
         
         setLoading(false);
         return;
@@ -135,13 +138,10 @@ const Register = () => {
 
       console.log("Perfil criado com sucesso:", profileResult);
 
-      // 3. Simular envio de email (em produção, isso seria feito por Supabase)
-      console.log("Simulando envio de email de confirmação...");
-      
-      // Mostrar mensagem de sucesso imediata
+      // 3. Mostrar mensagem de sucesso
       showSuccess("Cadastro realizado com sucesso! Verifique seu email para confirmar sua conta.");
       
-      // Redirecionar após um pequeno delay
+      // 4. Redirecionar após um pequeno delay
       setTimeout(() => {
         navigate('/login');
       }, 2000);
