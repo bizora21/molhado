@@ -552,7 +552,7 @@ const RegisterPrestador = () => {
                                 name="password"
                                 type={showPassword ? "text" : "password"}
                                 required
-                                placeholder="•••••••••••••"
+                                placeholder="•••••••••••••••"
                                 value={formData.password}
                                 onChange={handleInputChange}
                                 className="h-12 pr-12"
@@ -581,7 +581,7 @@ const RegisterPrestador = () => {
                                 name="confirmPassword"
                                 type={showConfirmPassword ? "text" : "password"}
                                 required
-                                placeholder="•••••••••••••"
+                                placeholder="••••••••••••••"
                                 value={formData.confirmPassword}
                                 onChange={handleInputChange}
                                 className="h-12 pr-12"
@@ -602,6 +602,7 @@ const RegisterPrestador = () => {
                             </div>
                           </div>
                         </div>
+                      </div>
 
                         <div className="flex items-center space-x-2">
                           <input
