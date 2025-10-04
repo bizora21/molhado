@@ -25,20 +25,12 @@
     --ring: 222.2 84% 4.9%;
     --radius: 0.5rem;
   }
-}
 
-@layer utilities {
-  .border-border {
-    border-color: hsl(var(--border));
-  }
-}
-
-@layer base {
   * {
-    @apply border-border;
+    @apply border-current;
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-white text-black;
   }
 }
