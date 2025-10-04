@@ -43,21 +43,24 @@ const Login = () => {
         return;
       }
 
-      switch (profile.user_type) {
-        case 'cliente':
-          navigate('/cliente-dashboard');
-          break;
-        case 'vendedor':
-          navigate('/vendedor-dashboard');
-          break;
-        case 'prestador':
-          navigate('/prestador-dashboard');
-          break;
-        default:
-          navigate('/');
-      }
-      
       showSuccess("Login realizado com sucesso!");
+      
+      // Redirecionar baseado no tipo de usuário
+      setTimeout(() => {
+        switch (profile.user_type) {
+          case 'cliente':
+            navigate('/cliente-dashboard');
+            break;
+          case 'vendedor':
+            navigate('/vendedor-dashboard');
+            break;
+          case 'prestador':
+            navigate('/prestador-dashboard');
+            break;
+          default:
+            navigate('/');
+        }
+      }, 1000);
     } catch (error) {
       showError("Erro ao fazer login");
     } finally {

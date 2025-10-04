@@ -50,14 +50,14 @@ const Chatbot = () => {
           <MessageCircle className="h-6 w-6" />
         </Button>
       ) : (
-        <Card className="w-[300px] shadow-2xl border-2 border-green-100 animate-in slide-in-from-bottom">
-          <div className="p-4 bg-green-500 text-white flex justify-between items-center">
+        <Card className="w-[320px] shadow-2xl border-2 border-green-100 bg-white">
+          <div className="p-4 bg-gradient-to-r from-green-500 to-green-600 text-white flex justify-between items-center rounded-t-lg">
             <h3 className="font-bold">Central de Ajuda</h3>
             <Button 
               variant="ghost" 
               size="sm" 
               onClick={() => setIsOpen(false)}
-              className="text-white hover:bg-green-600"
+              className="text-white hover:bg-green-700 h-8 w-8 p-0"
             >
               <X className="h-4 w-4" />
             </Button>
@@ -66,7 +66,9 @@ const Chatbot = () => {
           <div className="p-4 space-y-2">
             {selectedQuestion ? (
               <div>
-                <p className="text-sm mb-4">{selectedQuestion}</p>
+                <div className="bg-gray-50 rounded-lg p-3 mb-3">
+                  <p className="text-sm text-gray-800 leading-relaxed">{selectedQuestion}</p>
+                </div>
                 <Button 
                   variant="outline" 
                   className="w-full"
@@ -77,20 +79,23 @@ const Chatbot = () => {
               </div>
             ) : (
               <>
+                <div className="mb-3">
+                  <p className="text-sm font-medium text-gray-700 mb-2">Como podemos ajudar?</p>
+                </div>
                 {QuickResponses.map((response) => (
                   <Button
                     key={response.id}
                     variant="outline"
-                    className="w-full justify-start"
+                    className="w-full justify-start mb-2 text-left h-auto py-2 px-3"
                     onClick={() => handleQuickResponse(response.answer)}
                   >
-                    {response.question}
+                    <span className="text-sm">{response.question}</span>
                   </Button>
                 ))}
                 
                 <Button 
                   variant="default" 
-                  className="w-full mt-4 bg-green-600 hover:bg-green-700"
+                  className="w-full mt-3 bg-green-600 hover:bg-green-700"
                   onClick={handleWhatsApp}
                 >
                   <MessageSquareShare className="mr-2 h-4 w-4" /> Falar no WhatsApp

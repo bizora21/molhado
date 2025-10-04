@@ -13,6 +13,10 @@ import AdicionarServico from "./pages/AdicionarServico";
 import Produtos from "./pages/Produtos";
 import Servicos from "./pages/Servicos";
 import Blog from "./pages/Blog";
+import Sobre from "./pages/Sobre";
+import Termos from "./pages/Termos";
+import Privacidade from "./pages/Privacidade";
+import Contato from "./pages/Contato";
 import NotFound from "./pages/NotFound";
 
 const App: React.FC = () => {
@@ -32,6 +36,10 @@ const App: React.FC = () => {
         <Route path="/produtos" element={<Produtos />} />
         <Route path="/servicos" element={<Servicos />} />
         <Route path="/blog" element={<Blog />} />
+        <Route path="/sobre" element={<Sobre />} />
+        <Route path="/termos" element={<Termos />} />
+        <Route path="/privacidade" element={<Privacidade />} />
+        <Route path="/contato" element={<Contato />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>

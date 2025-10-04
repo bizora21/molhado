@@ -79,8 +79,10 @@ const Register = () => {
           return;
         }
 
-        showSuccess("Cadastro realizado com sucesso! Verifique seu email.");
-        navigate('/login');
+        showSuccess("Cadastro realizado com sucesso! Você já pode fazer login.");
+        setTimeout(() => {
+          navigate('/login');
+        }, 2000);
       }
     } catch (error) {
       showError("Erro ao realizar cadastro");

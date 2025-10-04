@@ -482,7 +482,7 @@ const Index: React.FC = () => {
               <div className="space-y-3 text-gray-400">
                 <div className="flex items-center space-x-2">
                   <Phone className="h-4 w-4" aria-hidden="true" />
-                  <span>+258 84 123 4567</span>
+                  <span>+258 86 318 1415</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Mail className="h-4 w-4" aria-hidden="true" />

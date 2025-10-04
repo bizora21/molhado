@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Search, Filter, ShoppingCart, Star, Store } from "lucide-react";
+import { Search, Filter, ShoppingCart, Star, Store, Home } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 const Produtos = () => {
@@ -77,6 +77,26 @@ const Produtos = () => {
 
   const fetchCategories = async () => {
     try {
+      // Categorias pré-definidas para garantir que sempre existam opções
+      const predefinedCategories = [
+        "Eletrônicos",
+        "Roupas e Acessórios", 
+        "Alimentos e Bebidas",
+        "Móveis e Decoração",
+        "Saúde e Beleza",
+        "Esportes e Lazer",
+        "Livros e Papelaria",
+        "Brinquedos e Jogos",
+        "Automotivo",
+        "Ferramentas e Construção",
+        "Casa e Jardim",
+        "Tecnologia e Informática",
+        "Bebês e Crianças",
+        "Pet Shop",
+        "Outros"
+      ];
+
+      // Buscar categorias existentes no banco
       const { data, error } = await supabase
         .from('products')
         .select('category')
@@ -84,11 +104,27 @@ const Produtos = () => {
         .not('category', 'is', null);
 
       if (!error && data) {
-        const uniqueCategories = [...new Set(data.map(item => item.category))];
-        setCategories(uniqueCategories);
+        const existingCategories = [...new Set(data.map(item => item.category))];
+        // Combinar categorias existentes com pré-definidas
+        const allCategories = [...new Set([...existingCategories, ...predefinedCategories])];
+        setCategories(allCategories);
+      } else {
+        // Se houver erro, usar categorias pré-definidas
+        setCategories(predefinedCategories);
       }
     } catch (error) {
       console.error('Error fetching categories:', error);
+      // Em caso de erro, usar categorias pré-definidas
+      setCategories([
+        "Eletrônicos",
+        "Roupas e Acessórios", 
+        "Alimentos e Bebidas",
+        "Móveis e Decoração",
+        "Saúde e Beleza",
+        "Esportes e Lazer",
+        "Livros e Papelaria",
+        "Outros"
+      ]);
     }
   };
 
@@ -227,7 +263,13 @@ const Produtos = () => {
               <div className="text-center py-12">
                 <ShoppingCart className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                 <h3 className="text-lg font-medium text-gray-900 mb-2">Nenhum produto encontrado</h3>
-                <p className="text-gray-600">Tente ajustar seus filtros ou termos de busca</p>
+                <p className="text-gray-600 mb-4">Tente ajustar seus filtros ou termos de busca</p>
+                <Link to="/">
+                  <Button variant="outline">
+                    <Home className="h-4 w-4 mr-2" />
+                    Voltar ao Início
+                  </Button>
+                </Link>
               </div>
             ) : (
               <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
