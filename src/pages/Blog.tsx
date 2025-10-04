@@ -11,7 +11,7 @@ const Blog = () => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all");
   const [categories, setCategories] = useState([]);
 
   useEffect(() => {
@@ -35,7 +35,7 @@ const Blog = () => {
         query = query.or(`title.ilike.%${searchQuery}%,content.ilike.%${searchQuery}%,excerpt.ilike.%${searchQuery}%`);
       }
 
-      if (selectedCategory) {
+      if (selectedCategory && selectedCategory !== "all") {
         query = query.eq('category', selectedCategory);
       }
 
@@ -132,9 +132,9 @@ const Blog = () => {
       <div className="container mx-auto px-4 py-8">
         <div className="flex flex-wrap gap-2 justify-center">
           <Button
-            variant={selectedCategory === "" ? "default" : "outline"}
+            variant={selectedCategory === "all" ? "default" : "outline"}
             size="sm"
-            onClick={() => setSelectedCategory("")}
+            onClick={() => setSelectedCategory("all")}
           >
             Todos
           </Button>

@@ -12,7 +12,7 @@ const Produtos = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all");
   const [sortBy, setSortBy] = useState("created_at");
   const [categories, setCategories] = useState([]);
 
@@ -44,7 +44,7 @@ const Produtos = () => {
         query = query.or(`name.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%`);
       }
 
-      if (selectedCategory) {
+      if (selectedCategory && selectedCategory !== "all") {
         query = query.eq('category', selectedCategory);
       }
 
@@ -140,7 +140,7 @@ const Produtos = () => {
       <div className="bg-white border-b">
         <div className="container mx-auto px-4 py-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Produtos</h1>
-          <p className="text-gray-600">Descubra os melhores produtos de vendedores locais em Moçambique</p>
+          <p className="text-gray-600">Encontre os melhores produtos de vendedores locais em Moçambique</p>
         </div>
       </div>
 
@@ -157,7 +157,7 @@ const Produtos = () => {
                   <SelectValue placeholder="Todas categorias" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Todas categorias</SelectItem>
+                  <SelectItem value="all">Todas categorias</SelectItem>
                   {categories.map((category) => (
                     <SelectItem key={category} value={category}>
                       {category}
@@ -190,7 +190,7 @@ const Produtos = () => {
                 className="w-full"
                 onClick={() => {
                   setSearchQuery("");
-                  setSelectedCategory("");
+                  setSelectedCategory("all");
                   setSortBy("created_at");
                 }}
               >

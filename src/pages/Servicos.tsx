@@ -12,7 +12,7 @@ const Servicos = () => {
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all");
   const [sortBy, setSortBy] = useState("created_at");
   const [categories, setCategories] = useState([]);
 
@@ -44,7 +44,7 @@ const Servicos = () => {
         query = query.or(`title.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%`);
       }
 
-      if (selectedCategory) {
+      if (selectedCategory && selectedCategory !== "all") {
         query = query.eq('category', selectedCategory);
       }
 
@@ -153,7 +153,7 @@ const Servicos = () => {
                   <SelectValue placeholder="Todas categorias" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Todas categorias</SelectItem>
+                  <SelectItem value="all">Todas categorias</SelectItem>
                   {categories.map((category) => (
                     <SelectItem key={category} value={category}>
                       {category}
@@ -186,7 +186,7 @@ const Servicos = () => {
                 className="w-full"
                 onClick={() => {
                   setSearchQuery("");
-                  setSelectedCategory("");
+                  setSelectedCategory("all");
                   setSortBy("created_at");
                 }}
               >
