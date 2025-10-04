@@ -22,6 +22,7 @@ import TesteConexao from "./pages/TesteConexao";
 import DebugSupabase from "./pages/DebugSupabase";
 import DiagnosticoRapido from "./pages/DiagnosticoRapido";
 import StatusFinal from "./pages/StatusFinal";
+import TesteRLS from "./pages/TesteRLS";
 import NotFound from "./pages/NotFound";
 
 const App: React.FC = () => {
@@ -50,6 +51,7 @@ const App: React.FC = () => {
         <Route path="/debug-supabase" element={<DebugSupabase />} />
         <Route path="/diagnostico" element={<DiagnosticoRapido />} />
         <Route path="/status-final" element={<StatusFinal />} />
+        <Route path="/teste-rls" element={<TesteRLS />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
