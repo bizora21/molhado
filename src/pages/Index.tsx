@@ -8,13 +8,11 @@ import {
   ShoppingCart, 
   Wrench, 
   Store, 
-  Book, 
   Star, 
   Users, 
   TrendingUp,
   Shield,
   Zap,
-  Globe,
   ChevronRight,
   Menu,
   X,
@@ -24,7 +22,9 @@ import {
   Mail,
   Facebook,
   Instagram,
-  Twitter
+  Twitter,
+  CheckCircle,
+  ArrowRight
 } from "lucide-react";
 import Chatbot from '@/components/Chatbot';
 
@@ -36,14 +36,14 @@ const Index: React.FC = () => {
     {
       icon: <Store className="h-8 w-8" />,
       title: "Vendedores Locais",
-      description: "Descubra produtos exclusivos de vendedores da sua região com preços competitivos",
+      description: "Produtos exclusivos de vendedores da sua região com preços competitivos",
       color: "text-blue-600",
       bgColor: "bg-blue-50"
     },
     {
       icon: <Wrench className="h-8 w-8" />,
       title: "Serviços Profissionais",
-      description: "Encontre profissionais qualificados e confiáveis para todos os tipos de serviços",
+      description: "Profissionais qualificados e confiáveis para todos os tipos de serviços",
       color: "text-green-600",
       bgColor: "bg-green-50"
     },
@@ -79,6 +79,27 @@ const Index: React.FC = () => {
     { name: "Saúde", icon: "💊", count: 321 }
   ];
 
+  const testimonials = [
+    {
+      name: "Ana Silva",
+      role: "Cliente",
+      content: "A melhor plataforma para comprar produtos locais. Entrega sempre no prazo!",
+      rating: 5
+    },
+    {
+      name: "João Mendes",
+      role: "Vendedor",
+      content: "Minhas vendas aumentaram 300% desde que me cadastrei na LojaRapida.",
+      rating: 5
+    },
+    {
+      name: "Maria Santos",
+      role: "Prestadora",
+      content: "Encontrei muitos clientes através da plataforma. Excelente ferramenta!",
+      rating: 5
+    }
+  ];
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       {/* Header */}
@@ -86,15 +107,15 @@ const Index: React.FC = () => {
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-8">
-              <Link to="/" className="flex items-center space-x-2">
+              <Link to="/" className="flex items-center space-x-2" aria-label="LojaRapida - Página inicial">
                 <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
                   <Store className="h-5 w-5 text-white" />
                 </div>
                 <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">LojaRapida</span>
               </Link>
               
-              <nav className="hidden lg:flex space-x-8">
-                <Link to="/" className="text-gray-900 hover:text-blue-600 font-medium transition-colors">Início</Link>
+              <nav className="hidden lg:flex space-x-8" role="navigation">
+                <Link to="/" className="text-gray-900 hover:text-blue-600 font-medium transition-colors" aria-current="page">Início</Link>
                 <Link to="/produtos" className="text-gray-600 hover:text-blue-600 transition-colors">Produtos</Link>
                 <Link to="/servicos" className="text-gray-600 hover:text-blue-600 transition-colors">Serviços</Link>
                 <Link to="/blog" className="text-gray-600 hover:text-blue-600 transition-colors">Blog</Link>
@@ -104,10 +125,11 @@ const Index: React.FC = () => {
             
             <div className="flex items-center space-x-4">
               <div className="hidden md:flex items-center space-x-2 bg-gray-100 rounded-lg px-3 py-2">
-                <Search className="h-4 w-4 text-gray-500" />
+                <Search className="h-4 w-4 text-gray-500" aria-hidden="true" />
                 <Input 
                   placeholder="Buscar produtos..." 
                   className="border-0 bg-transparent focus:ring-0 w-48"
+                  aria-label="Buscar produtos"
                 />
               </div>
               
@@ -127,6 +149,7 @@ const Index: React.FC = () => {
                 size="icon"
                 className="lg:hidden"
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
+                aria-label={isMenuOpen ? "Fechar menu" : "Abrir menu"}
               >
                 {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
               </Button>
@@ -138,7 +161,7 @@ const Index: React.FC = () => {
         {isMenuOpen && (
           <div className="lg:hidden bg-white border-t border-gray-100">
             <div className="container mx-auto px-4 py-4 space-y-3">
-              <Link to="/" className="block text-gray-900 hover:text-blue-600 font-medium">Início</Link>
+              <Link to="/" className="block text-gray-900 hover:text-blue-600 font-medium" aria-current="page">Início</Link>
               <Link to="/produtos" className="block text-gray-600 hover:text-blue-600">Produtos</Link>
               <Link to="/servicos" className="block text-gray-600 hover:text-blue-600">Serviços</Link>
               <Link to="/blog" className="block text-gray-600 hover:text-blue-600">Blog</Link>
@@ -157,7 +180,7 @@ const Index: React.FC = () => {
       </header>
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-blue-50 via-white to-purple-50">
+      <section className="relative overflow-hidden bg-gradient-to-br from-blue-50 via-white to-purple-50" aria-labelledby="hero-title">
         <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-purple-600/10"></div>
         <div className="container mx-auto px-4 py-20 lg:py-32 relative">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -165,14 +188,14 @@ const Index: React.FC = () => {
               <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-200 w-fit">
                 🚀 A maior plataforma de e-commerce de Moçambique
               </Badge>
-              <h1 className="text-4xl lg:text-6xl font-bold text-gray-900 leading-tight">
+              <h1 id="hero-title" className="text-4xl lg:text-6xl font-bold text-gray-900 leading-tight">
                 Conectando 
                 <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"> Negócios</span> 
                 <br />e 
                 <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent"> Oportunidades</span>
               </h1>
               <p className="text-xl text-gray-600 leading-relaxed">
-                Descubra a melhor forma de comprar produtos e contratar serviços em Moçambique. 
+                A forma mais simples de comprar produtos e contratar serviços em Moçambique. 
                 Conectamos vendedores locais, prestadores de serviços e clientes em uma plataforma segura e intuitiva.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
@@ -191,15 +214,15 @@ const Index: React.FC = () => {
               </div>
               <div className="flex items-center space-x-6 text-sm text-gray-600">
                 <div className="flex items-center">
-                  <Star className="h-4 w-4 text-yellow-400 fill-current mr-1" />
+                  <Star className="h-4 w-4 text-yellow-400 fill-current mr-1" aria-hidden="true" />
                   <span>4.8/5 Avaliação</span>
                 </div>
                 <div className="flex items-center">
-                  <Users className="h-4 w-4 text-blue-600 mr-1" />
+                  <Users className="h-4 w-4 text-blue-600 mr-1" aria-hidden="true" />
                   <span>100,000+ Clientes</span>
                 </div>
                 <div className="flex items-center">
-                  <Shield className="h-4 w-4 text-green-600 mr-1" />
+                  <Shield className="h-4 w-4 text-green-600 mr-1" aria-hidden="true" />
                   <span>100% Seguro</span>
                 </div>
               </div>
@@ -209,19 +232,19 @@ const Index: React.FC = () => {
               <div className="relative bg-white rounded-3xl shadow-2xl p-8">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="bg-blue-50 rounded-xl p-4 text-center">
-                    <Store className="h-8 w-8 text-blue-600 mx-auto mb-2" />
+                    <Store className="h-8 w-8 text-blue-600 mx-auto mb-2" aria-hidden="true" />
                     <p className="text-sm font-medium">10,000+ Lojas</p>
                   </div>
                   <div className="bg-green-50 rounded-xl p-4 text-center">
-                    <Wrench className="h-8 w-8 text-green-600 mx-auto mb-2" />
+                    <Wrench className="h-8 w-8 text-green-600 mx-auto mb-2" aria-hidden="true" />
                     <p className="text-sm font-medium">5,000+ Serviços</p>
                   </div>
                   <div className="bg-purple-50 rounded-xl p-4 text-center">
-                    <Users className="h-8 w-8 text-purple-600 mx-auto mb-2" />
+                    <Users className="h-8 w-8 text-purple-600 mx-auto mb-2" aria-hidden="true" />
                     <p className="text-sm font-medium">100,000+ Usuários</p>
                   </div>
                   <div className="bg-orange-50 rounded-xl p-4 text-center">
-                    <TrendingUp className="h-8 w-8 text-orange-600 mx-auto mb-2" />
+                    <TrendingUp className="h-8 w-8 text-orange-600 mx-auto mb-2" aria-hidden="true" />
                     <p className="text-sm font-medium">Crescimento 200%</p>
                   </div>
                 </div>
@@ -232,8 +255,9 @@ const Index: React.FC = () => {
       </section>
 
       {/* Stats Section */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-white" aria-labelledby="stats-title">
         <div className="container mx-auto px-4">
+          <h2 id="stats-title" className="sr-only">Nossas Estatísticas</h2>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
             {stats.map((stat, index) => (
               <div key={index} className="text-center">
@@ -248,11 +272,11 @@ const Index: React.FC = () => {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 bg-gray-50">
+      <section className="py-20 bg-gray-50" aria-labelledby="features-title">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-200 mb-4">Recursos</Badge>
-            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+            <h2 id="features-title" className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
               Por que escolher a LojaRapida?
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
@@ -281,12 +305,12 @@ const Index: React.FC = () => {
       </section>
 
       {/* Categories Section */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-white" aria-labelledby="categories-title">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <Badge className="bg-purple-100 text-purple-800 hover:bg-purple-200 mb-4">Categorias Populares</Badge>
-            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-              Explore nossas categorias
+            <h2 id="categories-title" className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+              Navegue por categorias
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               Encontre tudo o que precisa em nossas categorias diversificadas
@@ -300,7 +324,7 @@ const Index: React.FC = () => {
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-4">
-                        <div className="text-3xl">{category.icon}</div>
+                        <div className="text-3xl" aria-hidden="true">{category.icon}</div>
                         <div>
                           <h3 className="font-semibold text-lg group-hover:text-blue-600 transition-colors">
                             {category.name}
@@ -308,7 +332,7 @@ const Index: React.FC = () => {
                           <p className="text-sm text-gray-500">{category.count} produtos</p>
                         </div>
                       </div>
-                      <ChevronRight className="h-5 w-5 text-gray-400 group-hover:text-blue-600 transition-colors" />
+                      <ChevronRight className="h-5 w-5 text-gray-400 group-hover:text-blue-600 transition-colors" aria-hidden="true" />
                     </div>
                   </CardContent>
                 </Card>
@@ -327,12 +351,53 @@ const Index: React.FC = () => {
         </div>
       </section>
 
+      {/* Testimonials Section */}
+      <section className="py-20 bg-gray-50" aria-labelledby="testimonials-title">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <Badge className="bg-green-100 text-green-800 hover:bg-green-200 mb-4">Depoimentos</Badge>
+            <h2 id="testimonials-title" className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+              O que nossos usuários dizem
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Histórias reais de pessoas que transformaram seus negócios com a LojaRapida
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-3 gap-8">
+            {testimonials.map((testimonial, index) => (
+              <Card key={index} className="border-0 shadow-lg">
+                <CardContent className="p-6">
+                  <div className="flex mb-4">
+                    {[...Array(testimonial.rating)].map((_, i) => (
+                      <Star key={i} className="h-5 w-5 text-yellow-400 fill-current" aria-hidden="true" />
+                    ))}
+                  </div>
+                  <p className="text-gray-700 mb-4 italic">"{testimonial.content}"</p>
+                  <div className="flex items-center">
+                    <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center mr-3">
+                      <span className="text-white font-semibold">
+                        {testimonial.name.charAt(0)}
+                      </span>
+                    </div>
+                    <div>
+                      <p className="font-semibold">{testimonial.name}</p>
+                      <p className="text-sm text-gray-600">{testimonial.role}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-blue-600 to-purple-600">
+      <section className="py-20 bg-gradient-to-r from-blue-600 to-purple-600" aria-labelledby="cta-title">
         <div className="container mx-auto px-4 text-center">
           <div className="max-w-3xl mx-auto">
-            <h2 className="text-3xl lg:text-4xl font-bold text-white mb-6">
-              Pronto para começar a vender ou comprar?
+            <h2 id="cta-title" className="text-3xl lg:text-4xl font-bold text-white mb-6">
+              Pronto para começar?
             </h2>
             <p className="text-xl text-blue-100 mb-8">
               Junte-se a milhares de vendedores e clientes que já confiam na LojaRapida
@@ -353,18 +418,19 @@ const Index: React.FC = () => {
             {/* Newsletter */}
             <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 max-w-md mx-auto">
               <h3 className="text-xl font-semibold text-white mb-4">Receba ofertas exclusivas</h3>
-              <div className="flex gap-2">
+              <form className="flex gap-2" onSubmit={(e) => e.preventDefault()}>
                 <Input
                   type="email"
                   placeholder="Seu email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="bg-white/90 placeholder-gray-500"
+                  aria-label="Email para newsletter"
                 />
-                <Button className="bg-white text-blue-600 hover:bg-gray-100">
+                <Button type="submit" className="bg-white text-blue-600 hover:bg-gray-100">
                   Inscrever
                 </Button>
-              </div>
+              </form>
             </div>
           </div>
         </div>
@@ -385,9 +451,9 @@ const Index: React.FC = () => {
                 A maior plataforma de e-commerce e serviços de Moçambique
               </p>
               <div className="flex space-x-4">
-                <Facebook className="h-5 w-5 text-gray-400 hover:text-white cursor-pointer" />
-                <Instagram className="h-5 w-5 text-gray-400 hover:text-white cursor-pointer" />
-                <Twitter className="h-5 w-5 text-gray-400 hover:text-white cursor-pointer" />
+                <Facebook className="h-5 w-5 text-gray-400 hover:text-white cursor-pointer" aria-label="Facebook" />
+                <Instagram className="h-5 w-5 text-gray-400 hover:text-white cursor-pointer" aria-label="Instagram" />
+                <Twitter className="h-5 w-5 text-gray-400 hover:text-white cursor-pointer" aria-label="Twitter" />
               </div>
             </div>
             
@@ -415,15 +481,15 @@ const Index: React.FC = () => {
               <h4 className="font-semibold mb-4">Contato</h4>
               <div className="space-y-3 text-gray-400">
                 <div className="flex items-center space-x-2">
-                  <Phone className="h-4 w-4" />
+                  <Phone className="h-4 w-4" aria-hidden="true" />
                   <span>+258 84 123 4567</span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <Mail className="h-4 w-4" />
+                  <Mail className="h-4 w-4" aria-hidden="true" />
                   <span>contato@lojarapida.co.mz</span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <MapPin className="h-4 w-4" />
+                  <MapPin className="h-4 w-4" aria-hidden="true" />
                   <span>Maputo, Moçambique</span>
                 </div>
               </div>
