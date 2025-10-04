@@ -18,6 +18,7 @@ import Termos from "./pages/Termos";
 import Privacidade from "./pages/Privacidade";
 import Contato from "./pages/Contato";
 import TesteCadastro from "./pages/TesteCadastro";
+import DiagnosticoRapido from "./pages/DiagnosticoRapido";
 import NotFound from "./pages/NotFound";
 
 const App: React.FC = () => {
@@ -42,6 +43,7 @@ const App: React.FC = () => {
         <Route path="/privacidade" element={<Privacidade />} />
         <Route path="/contato" element={<Contato />} />
         <Route path="/teste-cadastro" element={<TesteCadastro />} />
+        <Route path="/diagnostico" element={<DiagnosticoRapido />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>

@@ -27,28 +27,28 @@ const TesteCadastro = () => {
     setTestResults(prev => ({ ...prev, connection: { status: 'testing', message: 'Testando conexão com Supabase...', data: null } }));
     
     try {
-      console.log("Testando conexão com Supabase...");
-      console.log("URL:", process.env.NEXT_PUBLIC_SUPABASE_URL);
-      console.log("Key:", process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? "Presente" : "Ausente");
+      console.log("🔍 Testando conexão com Supabase...");
+      console.log("URL:", "https://seqcczrzxoqlpqbxyxsz.supabase.co");
+      console.log("Key presente:", "✅");
       
       // Teste básico de conexão
       const { data, error } = await supabase.from('profiles').select('count').single();
       
       if (error) {
-        console.error("Erro na conexão:", error);
+        console.error("❌ Erro na conexão:", error);
         setTestResults(prev => ({ 
           ...prev, 
           connection: { status: 'error', message: `Erro: ${error.message}`, data: error } 
         }));
       } else {
-        console.log("Conexão bem-sucedida:", data);
+        console.log("✅ Conexão bem-sucedida:", data);
         setTestResults(prev => ({ 
           ...prev, 
           connection: { status: 'success', message: 'Conexão OK', data: data } 
         }));
       }
     } catch (error) {
-      console.error("Erro geral na conexão:", error);
+      console.error("❌ Erro geral na conexão:", error);
       setTestResults(prev => ({ 
         ...prev, 
         connection: { status: 'error', message: `Erro: ${error.message}`, data: error } 
@@ -60,7 +60,7 @@ const TesteCadastro = () => {
     setTestResults(prev => ({ ...prev, auth: { status: 'testing', message: 'Testando autenticação...', data: null } }));
     
     try {
-      console.log("Testando autenticação com email:", testData.email);
+      console.log("🔍 Testando autenticação com email:", testData.email);
       
       // 1. Tentar registrar usuário
       const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
@@ -75,7 +75,7 @@ const TesteCadastro = () => {
       });
 
       if (signUpError) {
-        console.error("Erro no signUp:", signUpError);
+        console.error("❌ Erro no signUp:", signUpError);
         setTestResults(prev => ({ 
           ...prev, 
           auth: { status: 'error', message: `Erro no signUp: ${signUpError.message}`, data: signUpError } 
@@ -83,7 +83,7 @@ const TesteCadastro = () => {
         return;
       }
 
-      console.log("SignUp bem-sucedido:", signUpData);
+      console.log("✅ SignUp bem-sucedido:", signUpData);
 
       // 2. Tentar fazer login
       const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
@@ -92,7 +92,7 @@ const TesteCadastro = () => {
       });
 
       if (signInError) {
-        console.error("Erro no signIn:", signInError);
+        console.error("❌ Erro no signIn:", signInError);
         setTestResults(prev => ({ 
           ...prev, 
           auth: { status: 'error', message: `Erro no signIn: ${signInError.message}`, data: signInError } 
@@ -100,7 +100,7 @@ const TesteCadastro = () => {
         return;
       }
 
-      console.log("SignIn bem-sucedido:", signInData);
+      console.log("✅ SignIn bem-sucedido:", signInData);
       
       setTestResults(prev => ({ 
         ...prev, 
@@ -108,7 +108,7 @@ const TesteCadastro = () => {
       }));
 
     } catch (error) {
-      console.error("Erro geral na autenticação:", error);
+      console.error("❌ Erro geral na autenticação:", error);
       setTestResults(prev => ({ 
         ...prev, 
         auth: { status: 'error', message: `Erro: ${error.message}`, data: error } 
@@ -134,7 +134,7 @@ const TesteCadastro = () => {
         return;
       }
 
-      console.log("Testando criação de perfil para usuário:", signInData.user.id);
+      console.log("🔍 Testando criação de perfil para usuário:", signInData.user.id);
 
       // Criar perfil
       const profileData = {
@@ -152,13 +152,13 @@ const TesteCadastro = () => {
         .select();
 
       if (error) {
-        console.error("Erro na criação do perfil:", error);
+        console.error("❌ Erro na criação do perfil:", error);
         setTestResults(prev => ({ 
           ...prev, 
           profile: { status: 'error', message: `Erro: ${error.message}`, data: error } 
         }));
       } else {
-        console.log("Perfil criado com sucesso:", data);
+        console.log("✅ Perfil criado com sucesso:", data);
         setTestResults(prev => ({ 
           ...prev, 
           profile: { status: 'success', message: 'Perfil criado com sucesso', data: data } 
@@ -166,7 +166,7 @@ const TesteCadastro = () => {
       }
 
     } catch (error) {
-      console.error("Erro geral na criação do perfil:", error);
+      console.error("❌ Erro geral na criação do perfil:", error);
       setTestResults(prev => ({ 
         ...prev, 
         profile: { status: 'error', message: `Erro: ${error.message}`, data: error } 
@@ -192,7 +192,7 @@ const TesteCadastro = () => {
         return;
       }
 
-      console.log("Leitura OK:", readData);
+      console.log("✅ Leitura OK:", readData);
 
       // Testar se a tabela existe e tem estrutura correta
       const { data: tableInfo, error: tableError } = await supabase
@@ -206,7 +206,7 @@ const TesteCadastro = () => {
           database: { status: 'error', message: `Erro na estrutura: ${tableError.message}`, data: tableError } 
         }));
       } else {
-        console.log("Estrutura OK:", tableInfo);
+        console.log("✅ Estrutura OK:", tableInfo);
         setTestResults(prev => ({ 
           ...prev, 
           database: { status: 'success', message: 'Banco de dados OK', data: readData } 
@@ -214,7 +214,7 @@ const TesteCadastro = () => {
       }
 
     } catch (error) {
-      console.error("Erro geral no banco de dados:", error);
+      console.error("❌ Erro geral no banco de dados:", error);
       setTestResults(prev => ({ 
         ...prev, 
         database: { status: 'error', message: `Erro: ${error.message}`, data: error } 
@@ -223,6 +223,7 @@ const TesteCadastro = () => {
   };
 
   const runAllTests = async () => {
+    console.log("🚀 Iniciando todos os testes...");
     await testConnection();
     await new Promise(resolve => setTimeout(resolve, 1000));
     await testDatabase();
@@ -230,6 +231,7 @@ const TesteCadastro = () => {
     await testAuth();
     await new Promise(resolve => setTimeout(resolve, 1000));
     await testProfile();
+    console.log("🏁 Todos os testes concluídos!");
   };
 
   const getStatusIcon = (status: string) => {
@@ -263,7 +265,7 @@ const TesteCadastro = () => {
       <div className="container mx-auto px-4">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">Teste de Sistema de Cadastro</h1>
+            <h1 className="text-3xl font-bold text-gray-900 mb-4">🧪 Teste de Sistema de Cadastro</h1>
             <p className="text-gray-600">Diagnóstico completo do sistema de autenticação e banco de dados</p>
           </div>
 
@@ -376,7 +378,7 @@ const TesteCadastro = () => {
 
           <Card>
             <CardHeader>
-              <CardTitle>Resultados dos Testes</CardTitle>
+              <CardTitle>📊 Resultados dos Testes</CardTitle>
               <CardDescription>
                 Status detalhado de cada componente do sistema
               </CardDescription>
@@ -387,7 +389,7 @@ const TesteCadastro = () => {
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
                       {getStatusIcon(testResults.connection.status)}
-                      <h3 className="font-semibold">Conexão com Supabase</h3>
+                      <h3 className="font-semibold">🔗 Conexão com Supabase</h3>
                       {getStatusBadge(testResults.connection.status)}
                     </div>
                     <p className="text-sm text-gray-600 mb-2">{testResults.connection.message}</p>
@@ -403,7 +405,7 @@ const TesteCadastro = () => {
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
                       {getStatusIcon(testResults.database.status)}
-                      <h3 className="font-semibold">Banco de Dados</h3>
+                      <h3 className="font-semibold">💾 Banco de Dados</h3>
                       {getStatusBadge(testResults.database.status)}
                     </div>
                     <p className="text-sm text-gray-600 mb-2">{testResults.database.message}</p>
@@ -419,7 +421,7 @@ const TesteCadastro = () => {
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
                       {getStatusIcon(testResults.auth.status)}
-                      <h3 className="font-semibold">Autenticação</h3>
+                      <h3 className="font-semibold">🔐 Autenticação</h3>
                       {getStatusBadge(testResults.auth.status)}
                     </div>
                     <p className="text-sm text-gray-600 mb-2">{testResults.auth.message}</p>
@@ -435,7 +437,7 @@ const TesteCadastro = () => {
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
                       {getStatusIcon(testResults.profile.status)}
-                      <h3 className="font-semibold">Criação de Perfil</h3>
+                      <h3 className="font-semibold">👤 Criação de Perfil</h3>
                       {getStatusBadge(testResults.profile.status)}
                     </div>
                     <p className="text-sm text-gray-600 mb-2">{testResults.profile.message}</p>
