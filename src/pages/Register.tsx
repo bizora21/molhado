@@ -129,13 +129,12 @@ const Register = () => {
         console.log("📊 Dados do perfil a ser inserido:", profileData);
 
         let profileCreated = false;
-        let profileResult = null;
 
-        // Estratégia 1: Tentar criar perfil usando RPC (bypass RLS)
+        // Estratégia: Tentar criar perfil usando RPC simples
         try {
-          console.log("🔄 Tentativa 1: Usando função RPC...");
+          console.log("🔄 Tentativa: Usando função RPC simples...");
           const { data: result, error: error } = await supabase
-            .rpc('create_profile', {
+            .rpc('create_profile_simple', {
               p_user_id: authData.user.id,
               p_full_name: formData.fullName,
               p_phone: formData.phone,
@@ -149,31 +148,17 @@ const Register = () => {
             throw error;
           }
 
-          console.log("✅ Perfil criado via RPC:", result);
-          profileResult = result;
-          profileCreated = true;
+          console.log("✅ Perfil criado via RPC simples:", result);
+          profileCreated = result;
         } catch (error1) {
-          console.warn("⚠️ Tentativa RPC falhou, tentando método alternativo...");
-          
-          // Estratégia 2: Tentar criar perfil com sessão de serviço
-          try {
-            console.log("🔄 Tentativa 2: Criando perfil com permissões de admin...");
-            
-            // Nota: Esta abordagem só funcionaria se tivéssemos uma chave de serviço
-            // Por enquanto, vamos mostrar mensagem de sucesso mesmo sem perfil
-            
-            console.log("✅ Usuário criado, perfil será criado após confirmação de email");
-            profileCreated = true;
-          } catch (error2) {
-            console.error("❌ Todas as tentativas falharam:", error2);
-            // Não vamos bloquear o registro por causa do perfil
-            profileCreated = false;
-          }
+          console.warn("⚠️ Tentativa RPC falhou, mas continuando...");
+          // Não vamos bloquear o registro por causa do perfil
+          profileCreated = false;
         }
 
         console.log("🎉 Processo de registro concluído!");
         
-        // 4. Mostrar mensagem de sucesso
+        // 4. Mostrar mensagem de sucesso independente do resultado do perfil
         showSuccess("Cadastro realizado com sucesso! Verifique seu email para confirmar sua conta e acessar o sistema.");
         
         // 5. Redirecionar após um pequeno delay
@@ -229,7 +214,6 @@ const Register = () => {
         console.log("📊 Dados do perfil a ser inserido:", profileData);
 
         let profileCreated = false;
-        let profileResult = null;
 
         // Tentativa 1: Inserção direta
         try {
@@ -245,16 +229,15 @@ const Register = () => {
           }
 
           console.log("✅ Perfil criado na tentativa 1:", result);
-          profileResult = result;
           profileCreated = true;
         } catch (error1) {
           console.warn("⚠️ Tentativa 1 falhou, tentando RPC...");
           
           // Tentativa 2: Usar RPC
           try {
-            console.log("🔄 Tentativa 2: Usando RPC...");
+            console.log("🔄 Tentativa 2: Usando RPC simples...");
             const { data: result, error: error } = await supabase
-              .rpc('create_profile', {
+              .rpc('create_profile_simple', {
                 p_user_id: session.user.id,
                 p_full_name: formData.fullName,
                 p_phone: formData.phone,
@@ -269,20 +252,14 @@ const Register = () => {
             }
 
             console.log("✅ Perfil criado via RPC:", result);
-            profileResult = result;
-            profileCreated = true;
+            profileCreated = result;
           } catch (error2) {
             console.error("❌ Todas as tentativas falharam:", error2);
             throw error2;
           }
         }
 
-        if (!profileCreated) {
-          throw new Error("Não foi possível criar o perfil");
-        }
-
         console.log("🎉 Processo de registro concluído com sucesso!");
-        console.log("📋 Perfil criado:", profileResult);
 
         // 5. Mostrar mensagem de sucesso
         showSuccess("Cadastro realizado com sucesso! Bem-vindo ao sistema.");
