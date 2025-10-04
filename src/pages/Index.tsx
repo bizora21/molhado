@@ -1,4 +1,5 @@
 import React from 'react';
+import Chatbot from '@/components/Chatbot';
 
 const Index: React.FC = () => {
   return (
@@ -13,6 +14,7 @@ const Index: React.FC = () => {
           </div>
         </div>
       </footer>
+      <Chatbot />
     </div>
   );
 };
