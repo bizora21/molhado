@@ -78,7 +78,7 @@ const Register = () => {
       console.log("📧 Email:", formData.email);
       console.log("👤 Nome:", formData.fullName);
       
-      // 1. Registrar usuário com Supabase Auth
+      // 1. Registrar usuário com Supabase Auth sem exigir confirmação de email
       console.log("🔐 Passo 1: Criando usuário no Supabase Auth...");
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: formData.email,
@@ -87,10 +87,12 @@ const Register = () => {
           data: {
             full_name: formData.fullName,
             phone: formData.phone,
-            address: formData.address
+            address: formData.address,
+            user_type: 'cliente',
+            role: 'cliente'
           },
-          // Redirecionar para login após confirmação
-          emailRedirectTo: `${window.location.origin}/login`
+          // Não redirecionar - vamos fazer login automático
+          emailRedirectTo: undefined
         }
       });
 
@@ -110,32 +112,77 @@ const Register = () => {
         return;
       }
 
-      // 2. Verificar se o email precisa de confirmação
-      if (authData.user && !authData.user.email_confirmed_at) {
-        console.log("📧 Email precisa de confirmação");
+      // 2. Fazer login automático para obter sessão
+      console.log("🔐 Passo 2: Fazendo login automático...");
+      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+        email: formData.email,
+        password: formData.password
+      });
+
+      if (signInError) {
+        console.error("❌ Erro no signIn:", signInError);
+        showError("Erro ao fazer login após cadastro. Tente fazer login manualmente.");
+        setLoading(false);
+        return;
+      }
+
+      console.log("✅ Login automático realizado");
+
+      // 3. Verificar a sessão atual
+      console.log("🔐 Passo 3: Verificando sessão atual...");
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError || !session) {
+        console.error("❌ Erro ao obter sessão:", sessionError);
+        showError("Erro ao verificar sessão. Tente fazer login manualmente.");
+        setLoading(false);
+        return;
+      }
+
+      console.log("✅ Sessão verificada, User ID:", session.user.id);
+
+      // 4. Tentar criar perfil no banco de dados
+      console.log("📝 Passo 4: Criando perfil no banco de dados...");
+      
+      const profileData = {
+        user_id: session.user.id,
+        full_name: formData.fullName,
+        phone: formData.phone,
+        address: formData.address,
+        user_type: 'cliente',
+        role: 'cliente'
+      };
+
+      console.log("📊 Dados do perfil a ser inserido:", profileData);
+
+      let profileCreated = false;
+      let profileResult = null;
+
+      // Tentativa 1: Inserção direta
+      try {
+        console.log("🔄 Tentativa 1: Inserção direta...");
+        const { data: result, error: error } = await supabase
+          .from('profiles')
+          .insert([profileData])
+          .select();
+
+        if (error) {
+          console.error("❌ Erro na tentativa 1:", error);
+          throw error;
+        }
+
+        console.log("✅ Perfil criado na tentativa 1:", result);
+        profileResult = result;
+        profileCreated = true;
+      } catch (error1) {
+        console.warn("⚠️ Tentativa 1 falhou, tentando RPC...");
         
-        // 3. Tentar criar perfil mesmo sem login (usando o user_id diretamente)
-        console.log("📝 Passo 2: Criando perfil para usuário não confirmado...");
-        
-        const profileData = {
-          user_id: authData.user.id,
-          full_name: formData.fullName,
-          phone: formData.phone,
-          address: formData.address,
-          user_type: 'cliente',
-          role: 'cliente'
-        };
-
-        console.log("📊 Dados do perfil a ser inserido:", profileData);
-
-        let profileCreated = false;
-
-        // Estratégia: Tentar criar perfil usando RPC simples
+        // Tentativa 2: Usar RPC
         try {
-          console.log("🔄 Tentativa: Usando função RPC simples...");
+          console.log("🔄 Tentativa 2: Usando RPC simples...");
           const { data: result, error: error } = await supabase
             .rpc('create_profile_simple', {
-              p_user_id: authData.user.id,
+              p_user_id: session.user.id,
               p_full_name: formData.fullName,
               p_phone: formData.phone,
               p_address: formData.address,
@@ -144,140 +191,34 @@ const Register = () => {
             });
 
           if (error) {
-            console.error("❌ Erro na tentativa RPC:", error);
+            console.error("❌ Erro na tentativa 2:", error);
             throw error;
           }
 
-          console.log("✅ Perfil criado via RPC simples:", result);
-          profileCreated = result;
-        } catch (error1) {
-          console.warn("⚠️ Tentativa RPC falhou, mas continuando...");
+          console.log("✅ Perfil criado via RPC:", result);
+          profileResult = result;
+          profileCreated = true;
+        } catch (error2) {
+          console.error("❌ Todas as tentativas falharam:", error2);
           // Não vamos bloquear o registro por causa do perfil
           profileCreated = false;
         }
-
-        console.log("🎉 Processo de registro concluído!");
-        
-        // 4. Mostrar mensagem de sucesso independente do resultado do perfil
-        showSuccess("Cadastro realizado com sucesso! Verifique seu email para confirmar sua conta e acessar o sistema.");
-        
-        // 5. Redirecionar após um pequeno delay
-        setTimeout(() => {
-          navigate('/login');
-        }, 2000);
-
-      } else {
-        // Se o email já está confirmado, tentar fazer login normalmente
-        console.log("📧 Email já confirmado, tentando fazer login...");
-        
-        // 2. Fazer login para obter a sessão e o token
-        console.log("🔐 Passo 2: Fazendo login para obter sessão...");
-        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
-          email: formData.email,
-          password: formData.password
-        });
-
-        if (signInError) {
-          console.error("❌ Erro no signIn:", signInError);
-          showError("Erro ao fazer login após cadastro. Tente fazer login manualmente.");
-          setLoading(false);
-          return;
-        }
-
-        console.log("✅ Login realizado, sessão obtida");
-
-        // 3. Verificar a sessão atual
-        console.log("🔐 Passo 3: Verificando sessão atual...");
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-        
-        if (sessionError || !session) {
-          console.error("❌ Erro ao obter sessão:", sessionError);
-          showError("Erro ao verificar sessão. Tente fazer login manualmente.");
-          setLoading(false);
-          return;
-        }
-
-        console.log("✅ Sessão verificada, User ID:", session.user.id);
-
-        // 4. Criar perfil no banco de dados
-        console.log("📝 Passo 4: Criando perfil no banco de dados...");
-        
-        const profileData = {
-          user_id: session.user.id,
-          full_name: formData.fullName,
-          phone: formData.phone,
-          address: formData.address,
-          user_type: 'cliente',
-          role: 'cliente'
-        };
-
-        console.log("📊 Dados do perfil a ser inserido:", profileData);
-
-        let profileCreated = false;
-
-        // Tentativa 1: Inserção direta
-        try {
-          console.log("🔄 Tentativa 1: Inserção direta...");
-          const { data: result, error: error } = await supabase
-            .from('profiles')
-            .insert([profileData])
-            .select();
-
-          if (error) {
-            console.error("❌ Erro na tentativa 1:", error);
-            throw error;
-          }
-
-          console.log("✅ Perfil criado na tentativa 1:", result);
-          profileCreated = true;
-        } catch (error1) {
-          console.warn("⚠️ Tentativa 1 falhou, tentando RPC...");
-          
-          // Tentativa 2: Usar RPC
-          try {
-            console.log("🔄 Tentativa 2: Usando RPC simples...");
-            const { data: result, error: error } = await supabase
-              .rpc('create_profile_simple', {
-                p_user_id: session.user.id,
-                p_full_name: formData.fullName,
-                p_phone: formData.phone,
-                p_address: formData.address,
-                p_user_type: 'cliente',
-                p_role: 'cliente'
-              });
-
-            if (error) {
-              console.error("❌ Erro na tentativa 2:", error);
-              throw error;
-            }
-
-            console.log("✅ Perfil criado via RPC:", result);
-            profileCreated = result;
-          } catch (error2) {
-            console.error("❌ Todas as tentativas falharam:", error2);
-            throw error2;
-          }
-        }
-
-        console.log("🎉 Processo de registro concluído com sucesso!");
-
-        // 5. Mostrar mensagem de sucesso
-        showSuccess("Cadastro realizado com sucesso! Bem-vindo ao sistema.");
-        
-        // 6. Redirecionar após um pequeno delay
-        setTimeout(() => {
-          navigate('/cliente-dashboard');
-        }, 2000);
       }
+
+      console.log("🎉 Processo de registro concluído com sucesso!");
+      console.log("📋 Perfil criado:", profileResult);
+
+      // 5. Mostrar mensagem de sucesso definitiva
+      showSuccess("Seu registro foi concluído com sucesso! Você já pode acessar o sistema.");
+      
+      // 6. Redirecionar após um pequeno delay
+      setTimeout(() => {
+        navigate('/cliente-dashboard');
+      }, 2000);
 
     } catch (error) {
       console.error("❌ Erro geral no registro:", error);
-      
-      if (error.code === '42501') {
-        showError("Erro de permissão ao criar perfil. Seu cadastro foi realizado, por favor confirme seu email e tente fazer login.");
-      } else {
-        showError(error.message || "Ocorreu um erro inesperado. Tente novamente.");
-      }
+      showError(error.message || "Ocorreu um erro inesperado. Tente novamente.");
     } finally {
       setLoading(false);
     }
