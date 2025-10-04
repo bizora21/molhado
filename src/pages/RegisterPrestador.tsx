@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Eye, EyeOff, Wrench, ArrowLeft, Upload, CheckCircle } from "lucide-react";
+import { Eye, EyeOff, Wrench, ArrowLeft, CheckCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { showSuccess, showError } from "@/utils/toast";
 
@@ -219,7 +219,6 @@ const RegisterPrestador = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-100">
-      {/* Header */}
       <header className="bg-white/80 backdrop-blur-sm border-b sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
@@ -239,7 +238,6 @@ const RegisterPrestador = () => {
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-6xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
-            {/* Left Side - Benefits */}
             <div className="space-y-8">
               <div>
                 <div className="bg-purple-100 text-purple-800 hover:bg-purple-200 mb-4 w-fit px-3 py-1 rounded-full text-sm font-medium">
@@ -280,7 +278,6 @@ const RegisterPrestador = () => {
               </div>
             </div>
 
-            {/* Right Side - Registration Form */}
             <div>
               <Card className="shadow-2xl border-0">
                 <CardHeader className="text-center pb-6">
@@ -293,7 +290,6 @@ const RegisterPrestador = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="px-8 pb-8">
-                  {/* Progress Steps */}
                   <div className="flex items-center justify-between mb-8">
                     {[1, 2, 3].map((stepNumber) => (
                       <div key={stepNumber} className="flex items-center">
@@ -541,7 +537,6 @@ const RegisterPrestador = () => {
                             <Label htmlFor="professionalHomeService">Atende em domicílio</Label>
                           </div>
                         </div>
-                      </div>
 
                         <div className="grid md:grid-cols-2 gap-4">
                           <div>
@@ -581,7 +576,7 @@ const RegisterPrestador = () => {
                                 name="confirmPassword"
                                 type={showConfirmPassword ? "text" : "password"}
                                 required
-                                placeholder="••••••••••••••"
+                                placeholder="•••••••••••••••"
                                 value={formData.confirmPassword}
                                 onChange={handleInputChange}
                                 className="h-12 pr-12"
@@ -602,7 +597,6 @@ const RegisterPrestador = () => {
                             </div>
                           </div>
                         </div>
-                      </div>
 
                         <div className="flex items-center space-x-2">
                           <input
