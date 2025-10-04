@@ -71,7 +71,7 @@ const Register = () => {
       return;
     }
 
-    setLoading(false);
+    setLoading(true);
     
     try {
       console.log("🚀 Iniciando processo de registro completo...");
