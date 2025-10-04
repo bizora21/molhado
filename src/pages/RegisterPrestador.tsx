@@ -43,63 +43,148 @@ const RegisterPrestador = () => {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Validações mais rigorosas
+    if (!formData.fullName.trim()) {
+      showError("Por favor, preencha seu nome completo");
+      return;
+    }
+
+    if (!formData.email.trim()) {
+      showError("Por favor, preencha seu email");
+      return;
+    }
+
+    if (!formData.phone.trim()) {
+      showError("Por favor, preencha seu telefone");
+      return;
+    }
+
+    if (!formData.professionalName.trim()) {
+      showError("Por favor, preencha seu nome profissional");
+      return;
+    }
+
+    if (!formData.professionalProfession.trim()) {
+      showError("Por favor, preencha sua profissão");
+      return;
+    }
+
+    if (!formData.professionalCategory) {
+      showError("Por favor, selecione uma categoria de serviço");
+      return;
+    }
+
+    if (!formData.professionalDescription.trim()) {
+      showError("Por favor, descreva seus serviços");
+      return;
+    }
+
+    if (!formData.professionalWhatsapp.trim()) {
+      showError("Por favor, preencha seu WhatsApp");
+      return;
+    }
+
     if (formData.password !== formData.confirmPassword) {
       showError("As senhas não coincidem");
       return;
     }
 
+    if (formData.password.length < 6) {
+      showError("A senha deve ter pelo menos 6 caracteres");
+      return;
+    }
+
+    // Validação de email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      showError("Por favor, insira um email válido");
+      return;
+    }
+
     setLoading(true);
+    
     try {
-      // Register user with Supabase Auth
-      const { data, error } = await supabase.auth.signUp({
+      console.log("Iniciando registro do prestador:", formData.email);
+      
+      // 1. Registrar usuário com Supabase Auth
+      const { data: authData, error: authError } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
         options: {
           data: {
             full_name: formData.fullName,
+            phone: formData.phone,
+            user_type: 'prestador'
           }
         }
       });
 
-      if (error) {
-        showError(error.message);
+      if (authError) {
+        console.error("Erro no auth.signUp:", authError);
+        showError(authError.message || "Erro ao criar conta. Tente novamente.");
+        setLoading(false);
         return;
       }
 
-      if (data.user) {
-        // Create user profile
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .insert([
-            {
-              user_id: data.user.id,
-              full_name: formData.fullName,
-              phone: formData.phone,
-              user_type: 'prestador',
-              role: 'prestador',
-              professional_name: formData.professionalName,
-              professional_profession: formData.professionalProfession,
-              professional_category: formData.professionalCategory,
-              professional_description: formData.professionalDescription,
-              professional_experience_years: formData.professionalExperienceYears ? parseInt(formData.professionalExperienceYears) : null,
-              professional_hourly_rate: formData.professionalHourlyRate ? parseFloat(formData.professionalHourlyRate) : null,
-              professional_min_price: formData.professionalMinPrice ? parseFloat(formData.professionalMinPrice) : null,
-              professional_whatsapp: formData.professionalWhatsapp,
-              professional_home_service: formData.professionalHomeService,
-              professional_service_radius_km: formData.professionalServiceRadiusKm ? parseFloat(formData.professionalServiceRadiusKm) : null,
-            }
-          ]);
+      console.log("Prestador registrado com sucesso:", authData.user);
 
-        if (profileError) {
-          showError("Erro ao criar perfil");
-          return;
-        }
-
-        showSuccess("Cadastro realizado com sucesso! Verifique seu email.");
-        navigate('/login');
+      if (!authData.user) {
+        console.error("Usuário não retornado do auth");
+        showError("Erro ao criar conta. Tente novamente.");
+        setLoading(false);
+        return;
       }
+
+      // 2. Criar perfil no banco de dados
+      const profileData = {
+        user_id: authData.user.id,
+        full_name: formData.fullName,
+        phone: formData.phone,
+        user_type: 'prestador',
+        role: 'prestador',
+        professional_name: formData.professionalName,
+        professional_profession: formData.professionalProfession,
+        professional_category: formData.professionalCategory,
+        professional_description: formData.professionalDescription,
+        professional_experience_years: formData.professionalExperienceYears ? parseInt(formData.professionalExperienceYears) : null,
+        professional_hourly_rate: formData.professionalHourlyRate ? parseFloat(formData.professionalHourlyRate) : null,
+        professional_min_price: formData.professionalMinPrice ? parseFloat(formData.professionalMinPrice) : null,
+        professional_whatsapp: formData.professionalWhatsapp,
+        professional_home_service: formData.professionalHomeService,
+        professional_service_radius_km: formData.professionalServiceRadiusKm ? parseFloat(formData.professionalServiceRadiusKm) : null,
+        email_confirmed_at: new Date().toISOString()
+      };
+
+      console.log("Criando perfil de prestador:", profileData);
+
+      const { data: profileResult, error: profileError } = await supabase
+        .from('profiles')
+        .insert([profileData]);
+
+      if (profileError) {
+        console.error("Erro ao criar perfil:", profileError);
+        showError("Erro ao salvar seus dados. Tente novamente.");
+        
+        // Tentar deletar o usuário criado para não deixar conta órfã
+        await supabase.auth.admin.deleteUser(authData.user.id);
+        
+        setLoading(false);
+        return;
+      }
+
+      console.log("Perfil de prestador criado com sucesso:", profileResult);
+
+      // 3. Mostrar mensagem de sucesso
+      showSuccess("Cadastro realizado com sucesso! Verifique seu email para confirmar sua conta.");
+      
+      // 4. Redirecionar após um pequeno delay
+      setTimeout(() => {
+        navigate('/login');
+      }, 2000);
+
     } catch (error) {
-      showError("Erro ao realizar cadastro");
+      console.error("Erro geral no registro:", error);
+      showError("Ocorreu um erro inesperado. Tente novamente.");
     } finally {
       setLoading(false);
     }
@@ -456,6 +541,7 @@ const RegisterPrestador = () => {
                             <Label htmlFor="professionalHomeService">Atende em domicílio</Label>
                           </div>
                         </div>
+                      </div>
 
                         <div className="grid md:grid-cols-2 gap-4">
                           <div>
@@ -466,7 +552,7 @@ const RegisterPrestador = () => {
                                 name="password"
                                 type={showPassword ? "text" : "password"}
                                 required
-                                placeholder="••••••••"
+                                placeholder="••••••••••••"
                                 value={formData.password}
                                 onChange={handleInputChange}
                                 className="h-12 pr-12"
@@ -495,7 +581,7 @@ const RegisterPrestador = () => {
                                 name="confirmPassword"
                                 type={showConfirmPassword ? "text" : "password"}
                                 required
-                                placeholder="••••••••"
+                                placeholder="••••••••••••"
                                 value={formData.confirmPassword}
                                 onChange={handleInputChange}
                                 className="h-12 pr-12"

@@ -21,31 +21,89 @@ const Login = () => {
 
   const handleLogin = async (userType: string) => {
     setLoading(true);
+    
+    console.log("Tentando login como:", userType, "com email:", formData.email);
+    
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
+      // 1. Verificar se o email foi preenchido
+      if (!formData.email.trim()) {
+        showError("Por favor, insira seu email");
+        setLoading(false);
+        return;
+      }
+
+      if (!formData.password.trim()) {
+        showError("Por favor, insira sua senha");
+        setLoading(false);
+        return;
+      }
+
+      // 2. Tentar fazer login com Supabase Auth
+      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
         email: formData.email,
         password: formData.password,
       });
 
-      if (error) {
-        showError("Email ou senha incorretos");
+      if (authError) {
+        console.error("Erro no signInWithPassword:", authError);
+        
+        // Mensagens de erro mais específicas
+        if (authError.message.includes("Invalid login credentials")) {
+          showError("Email ou senha incorretos");
+        } else if (authError.message.includes("Email not confirmed")) {
+          showError("Por favor, confirme seu email antes de fazer login");
+        } else {
+          showError(authError.message || "Erro ao fazer login");
+        }
+        
+        setLoading(false);
         return;
       }
 
+      console.log("Login bem-sucedido:", authData.user);
+
+      if (!authData.user) {
+        console.error("Usuário não encontrado nos dados de autenticação");
+        showError("Erro ao fazer login");
+        setLoading(false);
+        return;
+      }
+
+      // 3. Buscar perfil do usuário
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
-        .select('user_type')
-        .eq('user_id', data.user?.id)
+        .select('user_type, full_name')
+        .eq('user_id', authData.user.id)
         .single();
 
-      if (profileError || !profile) {
+      if (profileError) {
+        console.error("Erro ao buscar perfil:", profileError);
         showError("Erro ao carregar perfil do usuário");
+        setLoading(false);
         return;
       }
 
-      showSuccess("Login realizado com sucesso!");
+      if (!profile) {
+        console.error("Perfil não encontrado");
+        showError("Perfil não encontrado. Entre em contato com o suporte.");
+        setLoading(false);
+        return;
+      }
+
+      console.log("Perfil encontrado:", profile);
+
+      // 4. Verificar se o tipo de usuário selecionado corresponde ao perfil
+      if (userType !== profile.user_type) {
+        console.error("Tipo de usuário selecionado não corresponde ao perfil");
+        showError(`Este email está registrado como ${profile.user_type}, mas você selecionou ${userType}`);
+        setLoading(false);
+        return;
+      }
+
+      // 5. Login bem-sucedido
+      showSuccess(`Bem-vindo de volta, ${profile.full_name}!`);
       
-      // Redirecionar baseado no tipo de usuário
+      // 6. Redirecionar para o dashboard correto
       setTimeout(() => {
         switch (profile.user_type) {
           case 'cliente':
@@ -61,8 +119,10 @@ const Login = () => {
             navigate('/');
         }
       }, 1000);
+
     } catch (error) {
-      showError("Erro ao fazer login");
+      console.error("Erro geral no login:", error);
+      showError("Ocorreu um erro inesperado. Tente novamente.");
     } finally {
       setLoading(false);
     }
@@ -81,15 +141,26 @@ const Login = () => {
       <header className="bg-white/80 backdrop-blur-sm border-b sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <Link to="/" className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                <Store className="h-5 w-5 text-white" />
-              </div>
-              <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">LojaRapida</span>
-            </Link>
-            <Link to="/register" className="text-blue-600 hover:text-blue-700 font-medium">
-              Não tem conta? Cadastre-se
-            </Link>
+            <div className="flex items-center space-x-8">
+              <Link to="/" className="flex items-center space-x-2">
+                <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+                  <Store className="h-5 w-5 text-white" />
+                </div>
+                <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">LojaRapida</span>
+              </Link>
+              <nav className="hidden lg:flex space-x-8">
+                <Link to="/" className="text-gray-900 hover:text-blue-600 font-medium transition-colors">Início</Link>
+                <Link to="/produtos" className="text-gray-600 hover:text-blue-600 transition-colors">Produtos</Link>
+                <Link to="/servicos" className="text-gray-600 hover:text-blue-600 transition-colors">Serviços</Link>
+                <Link to="/blog" className="text-gray-600 hover:text-blue-600 transition-colors">Blog</Link>
+              </nav>
+            </div>
+            
+            <div className="flex items-center space-x-4">
+              <Link to="/register" className="text-blue-600 hover:text-blue-700 font-medium">
+                Não tem conta? Cadastre-se
+              </Link>
+            </div>
           </div>
         </div>
       </header>
@@ -174,7 +245,10 @@ const Login = () => {
                       </TabsTrigger>
                     </TabsList>
 
-                    <form onSubmit={(e) => e.preventDefault()} className="space-y-6">
+                    <form onSubmit={(e) => {
+                      e.preventDefault();
+                      handleLogin('cliente');
+                    }} className="space-y-6">
                       <div className="space-y-4">
                         <div>
                           <Label htmlFor="email">Email</Label>
@@ -198,7 +272,7 @@ const Login = () => {
                               name="password"
                               type={showPassword ? "text" : "password"}
                               required
-                              placeholder="••••••••"
+                              placeholder="••••••••••"
                               value={formData.password}
                               onChange={handleInputChange}
                               className="h-12 pr-12"

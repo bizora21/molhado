@@ -33,6 +33,27 @@ const Register = () => {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Validações mais rigorosas
+    if (!formData.fullName.trim()) {
+      showError("Por favor, preencha seu nome completo");
+      return;
+    }
+
+    if (!formData.email.trim()) {
+      showError("Por favor, preencha seu email");
+      return;
+    }
+
+    if (!formData.phone.trim()) {
+      showError("Por favor, preencha seu telefone");
+      return;
+    }
+
+    if (!formData.address.trim()) {
+      showError("Por favor, preencha seu endereço");
+      return;
+    }
+
     if (formData.password !== formData.confirmPassword) {
       showError("As senhas não coincidem");
       return;
@@ -43,49 +64,91 @@ const Register = () => {
       return;
     }
 
+    // Validação de email mais forte
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      showError("Por favor, insira um email válido");
+      return;
+    }
+
     setLoading(true);
+    
     try {
-      const { data, error } = await supabase.auth.signUp({
+      console.log("Iniciando registro do usuário:", formData.email);
+      
+      // 1. Registrar usuário com Supabase Auth
+      const { data: authData, error: authError } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
         options: {
           data: {
             full_name: formData.fullName,
+            phone: formData.phone,
+            address: formData.address
           }
         }
       });
 
-      if (error) {
-        showError(error.message);
+      if (authError) {
+        console.error("Erro no auth.signUp:", authError);
+        showError(authError.message || "Erro ao criar conta. Tente novamente.");
+        setLoading(false);
         return;
       }
 
-      if (data.user) {
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .insert([
-            {
-              user_id: data.user.id,
-              full_name: formData.fullName,
-              phone: formData.phone,
-              address: formData.address,
-              user_type: 'cliente',
-              role: 'cliente'
-            }
-          ]);
+      console.log("Usuário registrado com sucesso:", authData.user);
 
-        if (profileError) {
-          showError("Erro ao criar perfil");
-          return;
-        }
-
-        showSuccess("Cadastro realizado com sucesso! Você já pode fazer login.");
-        setTimeout(() => {
-          navigate('/login');
-        }, 2000);
+      if (!authData.user) {
+        console.error("Usuário não retornado do auth");
+        showError("Erro ao criar conta. Tente novamente.");
+        setLoading(false);
+        return;
       }
+
+      // 2. Criar perfil no banco de dados
+      const profileData = {
+        user_id: authData.user.id,
+        full_name: formData.fullName,
+        phone: formData.phone,
+        address: formData.address,
+        user_type: 'cliente',
+        role: 'cliente',
+        email_confirmed_at: new Date().toISOString()
+      };
+
+      console.log("Criando perfil:", profileData);
+
+      const { data: profileResult, error: profileError } = await supabase
+        .from('profiles')
+        .insert([profileData]);
+
+      if (profileError) {
+        console.error("Erro ao criar perfil:", profileError);
+        showError("Erro ao salvar seus dados. Tente novamente.");
+        
+        // Tentar deletar o usuário criado para não deixar conta órfã
+        await supabase.auth.admin.deleteUser(authData.user.id);
+        
+        setLoading(false);
+        return;
+      }
+
+      console.log("Perfil criado com sucesso:", profileResult);
+
+      // 3. Simular envio de email (em produção, isso seria feito por Supabase)
+      console.log("Simulando envio de email de confirmação...");
+      
+      // Mostrar mensagem de sucesso imediata
+      showSuccess("Cadastro realizado com sucesso! Verifique seu email para confirmar sua conta.");
+      
+      // Redirecionar após um pequeno delay
+      setTimeout(() => {
+        navigate('/login');
+      }, 2000);
+
     } catch (error) {
-      showError("Erro ao realizar cadastro");
+      console.error("Erro geral no registro:", error);
+      showError("Ocorreu um erro inesperado. Tente novamente.");
     } finally {
       setLoading(false);
     }
@@ -318,7 +381,7 @@ const Register = () => {
                               name="password"
                               type={showPassword ? "text" : "password"}
                               required
-                              placeholder="••••••••"
+                              placeholder="••••••••••"
                               value={formData.password}
                               onChange={handleInputChange}
                               className="h-12 pr-12"
@@ -347,7 +410,7 @@ const Register = () => {
                               name="confirmPassword"
                               type={showConfirmPassword ? "text" : "password"}
                               required
-                              placeholder="••••••••"
+                              placeholder="••••••••••"
                               value={formData.confirmPassword}
                               onChange={handleInputChange}
                               className="h-12 pr-12"
@@ -403,7 +466,14 @@ const Register = () => {
                             className="flex-1 h-12 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
                             disabled={loading}
                           >
-                            {loading ? "Cadastrando..." : "Criar Conta"}
+                            {loading ? (
+                              <>
+                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                                Cadastrando...
+                              </>
+                            ) : (
+                              "Criar Conta"
+                            )}
                           </Button>
                         </div>
                       </div>

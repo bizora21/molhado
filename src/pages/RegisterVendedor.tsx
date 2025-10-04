@@ -42,61 +42,147 @@ const RegisterVendedor = () => {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Validações mais rigorosas
+    if (!formData.fullName.trim()) {
+      showError("Por favor, preencha seu nome completo");
+      return;
+    }
+
+    if (!formData.email.trim()) {
+      showError("Por favor, preencha seu email");
+      return;
+    }
+
+    if (!formData.phone.trim()) {
+      showError("Por favor, preencha seu telefone");
+      return;
+    }
+
+    if (!formData.storeName.trim()) {
+      showError("Por favor, preencha o nome da sua loja");
+      return;
+    }
+
+    if (!formData.storeCategory) {
+      showError("Por favor, selecione uma categoria para sua loja");
+      return;
+    }
+
+    if (!formData.storeAddress.trim()) {
+      showError("Por favor, preencha o endereço da sua loja");
+      return;
+    }
+
+    if (!formData.storeOpeningHours.trim()) {
+      showError("Por favor, preencha o horário de funcionamento");
+      return;
+    }
+
+    if (!formData.storeWhatsapp.trim()) {
+      showError("Por favor, preencha o WhatsApp da sua loja");
+      return;
+    }
+
     if (formData.password !== formData.confirmPassword) {
       showError("As senhas não coincidem");
       return;
     }
 
+    if (formData.password.length < 6) {
+      showError("A senha deve ter pelo menos 6 caracteres");
+      return;
+    }
+
+    // Validação de email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      showError("Por favor, insira um email válido");
+      return;
+    }
+
     setLoading(true);
+    
     try {
-      // Register user with Supabase Auth
-      const { data, error } = await supabase.auth.signUp({
+      console.log("Iniciando registro do vendedor:", formData.email);
+      
+      // 1. Registrar usuário com Supabase Auth
+      const { data: authData, error: authError } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
         options: {
           data: {
             full_name: formData.fullName,
+            phone: formData.phone,
+            user_type: 'vendedor'
           }
         }
       });
 
-      if (error) {
-        showError(error.message);
+      if (authError) {
+        console.error("Erro no auth.signUp:", authError);
+        showError(authError.message || "Erro ao criar conta. Tente novamente.");
+        setLoading(false);
         return;
       }
 
-      if (data.user) {
-        // Create user profile
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .insert([
-            {
-              user_id: data.user.id,
-              full_name: formData.fullName,
-              phone: formData.phone,
-              user_type: 'vendedor',
-              role: 'vendedor',
-              store_name: formData.storeName,
-              store_category: formData.storeCategory,
-              store_description: formData.storeDescription,
-              store_opening_hours: formData.storeOpeningHours,
-              store_whatsapp: formData.storeWhatsapp,
-              store_accepts_delivery: formData.storeAcceptsDelivery,
-              store_delivery_radius_km: formData.storeDeliveryRadiusKm ? parseFloat(formData.storeDeliveryRadiusKm) : null,
-              store_delivery_fee: formData.storeDeliveryFee ? parseFloat(formData.storeDeliveryFee) : null,
-            }
-          ]);
+      console.log("Vendedor registrado com sucesso:", authData.user);
 
-        if (profileError) {
-          showError("Erro ao criar perfil");
-          return;
-        }
-
-        showSuccess("Cadastro realizado com sucesso! Verifique seu email.");
-        navigate('/login');
+      if (!authData.user) {
+        console.error("Usuário não retornado do auth");
+        showError("Erro ao criar conta. Tente novamente.");
+        setLoading(false);
+        return;
       }
+
+      // 2. Criar perfil no banco de dados
+      const profileData = {
+        user_id: authData.user.id,
+        full_name: formData.fullName,
+        phone: formData.phone,
+        user_type: 'vendedor',
+        role: 'vendedor',
+        store_name: formData.storeName,
+        store_category: formData.storeCategory,
+        store_description: formData.storeDescription,
+        store_address: formData.storeAddress,
+        store_opening_hours: formData.storeOpeningHours,
+        store_whatsapp: formData.storeWhatsapp,
+        store_accepts_delivery: formData.storeAcceptsDelivery,
+        store_delivery_radius_km: formData.storeDeliveryRadiusKm ? parseFloat(formData.storeDeliveryRadiusKm) : null,
+        store_delivery_fee: formData.storeDeliveryFee ? parseFloat(formData.storeDeliveryFee) : null,
+        email_confirmed_at: new Date().toISOString()
+      };
+
+      console.log("Criando perfil de vendedor:", profileData);
+
+      const { data: profileResult, error: profileError } = await supabase
+        .from('profiles')
+        .insert([profileData]);
+
+      if (profileError) {
+        console.error("Erro ao criar perfil:", profileError);
+        showError("Erro ao salvar seus dados. Tente novamente.");
+        
+        // Tentar deletar o usuário criado para não deixar conta órfã
+        await supabase.auth.admin.deleteUser(authData.user.id);
+        
+        setLoading(false);
+        return;
+      }
+
+      console.log("Perfil de vendedor criado com sucesso:", profileResult);
+
+      // 3. Mostrar mensagem de sucesso
+      showSuccess("Cadastro realizado com sucesso! Verifique seu email para confirmar sua conta.");
+      
+      // 4. Redirecionar após um pequeno delay
+      setTimeout(() => {
+        navigate('/login');
+      }, 2000);
+
     } catch (error) {
-      showError("Erro ao realizar cadastro");
+      console.error("Erro geral no registro:", error);
+      showError("Ocorreu um erro inesperado. Tente novamente.");
     } finally {
       setLoading(false);
     }
@@ -448,7 +534,7 @@ const RegisterVendedor = () => {
                                 name="password"
                                 type={showPassword ? "text" : "password"}
                                 required
-                                placeholder="••••••••"
+                                placeholder="•••••••••••"
                                 value={formData.password}
                                 onChange={handleInputChange}
                                 className="h-12 pr-12"
@@ -477,7 +563,7 @@ const RegisterVendedor = () => {
                                 name="confirmPassword"
                                 type={showConfirmPassword ? "text" : "password"}
                                 required
-                                placeholder="••••••••"
+                                placeholder="•••••••••••"
                                 value={formData.confirmPassword}
                                 onChange={handleInputChange}
                                 className="h-12 pr-12"
