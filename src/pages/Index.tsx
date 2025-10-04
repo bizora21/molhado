@@ -24,7 +24,11 @@ import {
   Instagram,
   Twitter,
   CheckCircle,
-  ArrowRight
+  ArrowRight,
+  Sparkles,
+  Target,
+  Rocket,
+  Crown
 } from "lucide-react";
 import Chatbot from '@/components/Chatbot';
 
@@ -104,7 +108,7 @@ const Index: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       {/* Header */}
       <header className="bg-white/95 backdrop-blur-sm shadow-sm sticky top-0 z-50 border-b border-gray-100">
-        <div className="container mx-auto px-4">
+        <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-8">
               <Link to="/" className="flex items-center space-x-2" aria-label="LojaRapida - Página inicial">
@@ -119,7 +123,6 @@ const Index: React.FC = () => {
                 <Link to="/produtos" className="text-gray-600 hover:text-blue-600 transition-colors">Produtos</Link>
                 <Link to="/servicos" className="text-gray-600 hover:text-blue-600 transition-colors">Serviços</Link>
                 <Link to="/blog" className="text-gray-600 hover:text-blue-600 transition-colors">Blog</Link>
-                <Link to="/sobre" className="text-gray-600 hover:text-blue-600 transition-colors">Sobre</Link>
               </nav>
             </div>
             
@@ -165,7 +168,6 @@ const Index: React.FC = () => {
               <Link to="/produtos" className="block text-gray-600 hover:text-blue-600">Produtos</Link>
               <Link to="/servicos" className="block text-gray-600 hover:text-blue-600">Serviços</Link>
               <Link to="/blog" className="block text-gray-600 hover:text-blue-600">Blog</Link>
-              <Link to="/sobre" className="block text-gray-600 hover:text-blue-600">Sobre</Link>
               <div className="flex space-x-3 pt-3 border-t">
                 <Link to="/login" className="flex-1">
                   <Button variant="outline" className="w-full">Entrar</Button>
@@ -185,68 +187,93 @@ const Index: React.FC = () => {
         <div className="container mx-auto px-4 py-20 lg:py-32 relative">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="space-y-8">
-              <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-200 w-fit">
+              <Badge className="bg-green-100 text-green-800 hover:bg-green-200 w-fit">
                 🚀 A maior plataforma de e-commerce de Moçambique
               </Badge>
               <h1 id="hero-title" className="text-4xl lg:text-6xl font-bold text-gray-900 leading-tight">
-                Conectando 
-                <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"> Negócios</span> 
-                <br />e 
-                <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent"> Oportunidades</span>
+                Transforme Seu 
+                <span className="bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent"> Negócio</span> 
+                <br />em 
+                <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"> Sucesso Digital</span>
               </h1>
               <p className="text-xl text-gray-600 leading-relaxed">
-                A forma mais simples de comprar produtos e contratar serviços em Moçambique. 
-                Conectamos vendedores locais, prestadores de serviços e clientes em uma plataforma segura e intuitiva.
+                Venda para milhares de clientes em toda Moçambique. 
+                Cadastre sua loja GRÁTIS e comece a faturar hoje mesmo!
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
+                <Link to="/register-vendedor">
+                  <Button size="lg" className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-lg px-8 py-6 shadow-lg transform hover:scale-105 transition-all duration-200">
+                    <Rocket className="h-5 w-5 mr-2" />
+                    Começar a Vender AGORA
+                  </Button>
+                </Link>
                 <Link to="/produtos">
-                  <Button size="lg" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-lg px-8 py-6">
+                  <Button size="lg" variant="outline" className="text-lg px-8 py-6 border-2 hover:bg-gray-50">
                     <ShoppingCart className="h-5 w-5 mr-2" />
                     Comprar Produtos
                   </Button>
                 </Link>
-                <Link to="/servicos">
-                  <Button size="lg" variant="outline" className="text-lg px-8 py-6 border-2">
-                    <Wrench className="h-5 w-5 mr-2" />
-                    Contratar Serviços
-                  </Button>
-                </Link>
               </div>
-              <div className="flex items-center space-x-6 text-sm text-gray-600">
-                <div className="flex items-center">
-                  <Star className="h-4 w-4 text-yellow-400 fill-current mr-1" aria-hidden="true" />
-                  <span>4.8/5 Avaliação</span>
+              
+              {/* Enhanced Stats */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-8">
+                <div className="text-center p-4 bg-white rounded-lg shadow-sm">
+                  <div className="text-2xl font-bold text-green-600 mb-1">10,000+</div>
+                  <div className="text-sm text-gray-600">Vendedores</div>
                 </div>
-                <div className="flex items-center">
-                  <Users className="h-4 w-4 text-blue-600 mr-1" aria-hidden="true" />
-                  <span>100,000+ Clientes</span>
+                <div className="text-center p-4 bg-white rounded-lg shadow-sm">
+                  <div className="text-2xl font-bold text-blue-600 mb-1">50,000+</div>
+                  <div className="text-sm text-gray-600">Produtos</div>
                 </div>
-                <div className="flex items-center">
-                  <Shield className="h-4 w-4 text-green-600 mr-1" aria-hidden="true" />
-                  <span>100% Seguro</span>
+                <div className="text-center p-4 bg-white rounded-lg shadow-sm">
+                  <div className="text-2xl font-bold text-purple-600 mb-1">100,000+</div>
+                  <div className="text-sm text-gray-600">Clientes</div>
+                </div>
+                <div className="text-center p-4 bg-white rounded-lg shadow-sm">
+                  <div className="text-2xl font-bold text-orange-600 mb-1">300%</div>
+                  <div className="text-sm text-gray-600">Crescimento</div>
                 </div>
               </div>
             </div>
+            
             <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-purple-400 rounded-3xl transform rotate-6 opacity-20"></div>
+              <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-emerald-400 rounded-3xl transform rotate-6 opacity-20"></div>
               <div className="relative bg-white rounded-3xl shadow-2xl p-8">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-blue-50 rounded-xl p-4 text-center">
-                    <Store className="h-8 w-8 text-blue-600 mx-auto mb-2" aria-hidden="true" />
-                    <p className="text-sm font-medium">10,000+ Lojas</p>
+                <div className="text-center mb-6">
+                  <div className="w-16 h-16 bg-gradient-to-r from-green-600 to-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <Crown className="h-8 w-8 text-white" />
                   </div>
-                  <div className="bg-green-50 rounded-xl p-4 text-center">
-                    <Wrench className="h-8 w-8 text-green-600 mx-auto mb-2" aria-hidden="true" />
-                    <p className="text-sm font-medium">5,000+ Serviços</p>
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">Plano Vendedor Premium</h3>
+                  <p className="text-gray-600 mb-4">Comece GRÁTITE hoje!</p>
+                </div>
+                
+                <div className="space-y-4">
+                  <div className="flex items-center space-x-3">
+                    <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0" />
+                    <span className="text-sm font-medium">0% de comissão nos primeiros 30 dias</span>
                   </div>
-                  <div className="bg-purple-50 rounded-xl p-4 text-center">
-                    <Users className="h-8 w-8 text-purple-600 mx-auto mb-2" aria-hidden="true" />
-                    <p className="text-sm font-medium">100,000+ Usuários</p>
+                  <div className="flex items-center space-x-3">
+                    <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0" />
+                    <span className="text-sm font-medium">Cadastro em menos de 2 minutos</span>
                   </div>
-                  <div className="bg-orange-50 rounded-xl p-4 text-center">
-                    <TrendingUp className="h-8 w-8 text-orange-600 mx-auto mb-2" aria-hidden="true" />
-                    <p className="text-sm font-medium">Crescimento 200%</p>
+                  <div className="flex items-center space-x-3">
+                    <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0" />
+                    <span className="text-sm font-medium">Acesso a 100,000+ clientes</span>
                   </div>
+                  <div className="flex items-center space-x-3">
+                    <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0" />
+                    <span className="text-sm font-medium">Suporte dedicado 24/7</span>
+                  </div>
+                </div>
+                
+                <div className="mt-6 text-center">
+                  <Link to="/register-vendedor">
+                    <Button className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-bold py-3">
+                      <Sparkles className="h-4 w-4 mr-2" />
+                      Começar Grátis
+                    </Button>
+                  </Link>
+                  <p className="text-xs text-gray-500 mt-2">Sem cartão de crédito necessário</p>
                 </div>
               </div>
             </div>
@@ -254,14 +281,63 @@ const Index: React.FC = () => {
         </div>
       </section>
 
+      {/* Enhanced CTA Section */}
+      <section className="py-16 bg-gradient-to-r from-green-600 to-emerald-600">
+        <div className="container mx-auto px-4 text-center">
+          <div className="max-w-4xl mx-auto">
+            <Badge className="bg-white/20 text-white hover:bg-white/30 mb-4">
+              🎯 OFERTA LIMITADA
+            </Badge>
+            <h2 className="text-4xl lg:text-5xl font-bold text-white mb-6">
+              Não Perca Esta Oportunidade!
+            </h2>
+            <p className="text-xl text-green-100 mb-8 max-w-3xl mx-auto">
+              Junte-se a mais de 10.000 vendedores que já estão lucrando com a LojaRapida. 
+              Cadastre-se HOJE e ganhe 30 dias de comissão ZERO!
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
+              <Link to="/register-vendedor">
+                <Button size="lg" variant="secondary" className="bg-white text-green-600 hover:bg-gray-100 text-lg px-12 py-6 font-bold shadow-xl transform hover:scale-105 transition-all duration-200">
+                  <Target className="h-6 w-6 mr-2" />
+                  QUERO VENDER AGORA!
+                </Button>
+              </Link>
+              <Link to="/register-prestador">
+                <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-green-600 text-lg px-12 py-6 font-bold">
+                  <Wrench className="h-6 w-6 mr-2" />
+                  Quero Oferecer Serviços
+                </Button>
+              </Link>
+            </div>
+            
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 max-w-md mx-auto">
+              <h3 className="text-xl font-semibold text-white mb-4">⏰ Tempo Restante</h3>
+              <div className="text-3xl font-bold text-white mb-4">
+                23:59:59
+              </div>
+              <p className="text-green-100 text-sm">
+                Aproveite esta oferta exclusiva antes que acabe!
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Stats Section */}
-      <section className="py-16 bg-white" aria-labelledby="stats-title">
+      <section className="py-16 bg-white">
         <div className="container mx-auto px-4">
-          <h2 id="stats-title" className="sr-only">Nossas Estatísticas</h2>
+          <div className="text-center mb-12">
+            <h2 id="stats-title" className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+              Números que Impressionam
+            </h2>
+            <p className="text-xl text-gray-600">
+              Resultados reais da nossa comunidade de vendedores
+            </p>
+          </div>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
             {stats.map((stat, index) => (
               <div key={index} className="text-center">
-                <div className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                <div className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
                   {stat.number}
                 </div>
                 <div className="text-gray-600 mt-2">{stat.label}</div>
@@ -275,12 +351,12 @@ const Index: React.FC = () => {
       <section className="py-20 bg-gray-50" aria-labelledby="features-title">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-200 mb-4">Recursos</Badge>
+            <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-200 mb-4">Por que a LojaRapida?</Badge>
             <h2 id="features-title" className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-              Por que escolher a LojaRapida?
+              A Melhor Plataforma para Vendedores
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Oferecemos a melhor experiência para comprar, vender e contratar serviços em Moçambique
+              Ferramentas poderosas para impulsionar suas vendas
             </p>
           </div>
           
@@ -310,29 +386,29 @@ const Index: React.FC = () => {
           <div className="text-center mb-16">
             <Badge className="bg-purple-100 text-purple-800 hover:bg-purple-200 mb-4">Categorias Populares</Badge>
             <h2 id="categories-title" className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-              Navegue por categorias
+              Venda em Qualquer Categoria
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Encontre tudo o que precisa em nossas categorias diversificadas
+              Encontre o nicho perfeito para o seu negócio
             </p>
           </div>
           
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {categories.map((category, index) => (
               <Link key={index} to="/produtos" className="group">
-                <Card className="border border-gray-200 hover:border-blue-300 hover:shadow-lg transition-all duration-300">
+                <Card className="border border-gray-200 hover:border-green-300 hover:shadow-lg transition-all duration-300">
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-4">
                         <div className="text-3xl" aria-hidden="true">{category.icon}</div>
                         <div>
-                          <h3 className="font-semibold text-lg group-hover:text-blue-600 transition-colors">
+                          <h3 className="font-semibold text-lg group-hover:text-green-600 transition-colors">
                             {category.name}
                           </h3>
                           <p className="text-sm text-gray-500">{category.count} produtos</p>
                         </div>
                       </div>
-                      <ChevronRight className="h-5 w-5 text-gray-400 group-hover:text-blue-600 transition-colors" aria-hidden="true" />
+                      <ChevronRight className="h-5 w-5 text-gray-400 group-hover:text-green-600 transition-colors" aria-hidden="true" />
                     </div>
                   </CardContent>
                 </Card>
@@ -341,10 +417,10 @@ const Index: React.FC = () => {
           </div>
           
           <div className="text-center mt-12">
-            <Link to="/produtos">
-              <Button size="lg" variant="outline" className="border-2">
-                Ver todas categorias
-                <ChevronRight className="h-5 w-5 ml-2" />
+            <Link to="/register-vendedor">
+              <Button size="lg" className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-lg px-8 py-4 font-bold">
+                <Store className="h-5 w-5 mr-2" />
+                Começar a Vender HOJE
               </Button>
             </Link>
           </div>
@@ -357,10 +433,10 @@ const Index: React.FC = () => {
           <div className="text-center mb-16">
             <Badge className="bg-green-100 text-green-800 hover:bg-green-200 mb-4">Depoimentos</Badge>
             <h2 id="testimonials-title" className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-              O que nossos usuários dizem
+              Vendedores que Estão Faturando Alto
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Histórias reais de pessoas que transformaram seus negócios com a LojaRapida
+              Histórias reais de sucesso na LojaRapida
             </p>
           </div>
           
@@ -375,7 +451,7 @@ const Index: React.FC = () => {
                   </div>
                   <p className="text-gray-700 mb-4 italic">"{testimonial.content}"</p>
                   <div className="flex items-center">
-                    <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center mr-3">
+                    <div className="w-10 h-10 bg-gradient-to-r from-green-600 to-emerald-600 rounded-full flex items-center justify-center mr-3">
                       <span className="text-white font-semibold">
                         {testimonial.name.charAt(0)}
                       </span>
@@ -392,43 +468,40 @@ const Index: React.FC = () => {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-blue-600 to-purple-600" aria-labelledby="cta-title">
+      {/* Final CTA Section */}
+      <section className="py-20 bg-gradient-to-r from-green-600 to-emerald-600" aria-labelledby="cta-title">
         <div className="container mx-auto px-4 text-center">
           <div className="max-w-3xl mx-auto">
-            <h2 id="cta-title" className="text-3xl lg:text-4xl font-bold text-white mb-6">
-              Pronto para começar?
+            <h2 id="cta-title" className="text-4xl lg:text-5xl font-bold text-white mb-6">
+              Está Pronto para Aumentar Suas Vendas?
             </h2>
-            <p className="text-xl text-blue-100 mb-8">
-              Junte-se a milhares de vendedores e clientes que já confiam na LojaRapida
+            <p className="text-xl text-green-100 mb-8">
+              Junte-se a milhares de vendedores que já transformaram seus negócios com a LojaRapida
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
-              <Link to="/register">
-                <Button size="lg" variant="secondary" className="text-lg px-8 py-6">
-                  Começar a Vender
-                </Button>
-              </Link>
-              <Link to="/register">
-                <Button size="lg" variant="outline" className="text-lg px-8 py-6 border-white text-white hover:bg-white hover:text-blue-600">
-                  Começar a Comprar
+              <Link to="/register-vendedor">
+                <Button size="lg" variant="secondary" className="bg-white text-green-600 hover:bg-gray-100 text-lg px-12 py-6 font-bold shadow-xl transform hover:scale-105 transition-all duration-200">
+                  <Rocket className="h-6 w-6 mr-2" />
+                  COMEÇAR A VENDER AGORA
                 </Button>
               </Link>
             </div>
             
-            {/* Newsletter */}
+            {/* Enhanced Newsletter */}
             <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 max-w-md mx-auto">
-              <h3 className="text-xl font-semibold text-white mb-4">Receba ofertas exclusivas</h3>
+              <h3 className="text-xl font-semibold text-white mb-4">🎁 Receba Dicas Exclusivas</h3>
+              <p className="text-green-100 mb-4">Ganhe 50% de desconto na primeira taxa!</p>
               <form className="flex gap-2" onSubmit={(e) => e.preventDefault()}>
                 <Input
                   type="email"
                   placeholder="Seu email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="bg-white/90 placeholder-gray-500"
+                  className="bg-white/90 placeholder-gray-500 flex-1"
                   aria-label="Email para newsletter"
                 />
-                <Button type="submit" className="bg-white text-blue-600 hover:bg-gray-100">
-                  Inscrever
+                <Button type="submit" className="bg-white text-green-600 hover:bg-gray-100 font-bold">
+                  Receber
                 </Button>
               </form>
             </div>
@@ -468,6 +541,16 @@ const Index: React.FC = () => {
             </div>
             
             <div>
+              <h4 className="font-semibold mb-4">Para Vendedores</h4>
+              <ul className="space-y-2 text-gray-400">
+                <li><Link to="/register-vendedor" className="hover:text-white transition-colors">Começar a Vender</Link></li>
+                <li><Link to="/vendedor-dashboard" className="hover:text-white transition-colors">Dashboard</Link></li>
+                <li><Link to="/adicionar-produto" className="hover:text-white transition-colors">Adicionar Produtos</Link></li>
+                <li><Link to="/termos" className="hover:text-white transition-colors">Taxas e Comissões</Link></li>
+              </ul>
+            </div>
+            
+            <div>
               <h4 className="font-semibold mb-4">Suporte</h4>
               <ul className="space-y-2 text-gray-400">
                 <li><Link to="/ajuda" className="hover:text-white transition-colors">Central de Ajuda</Link></li>
@@ -475,24 +558,6 @@ const Index: React.FC = () => {
                 <li><Link to="/termos" className="hover:text-white transition-colors">Termos de Serviço</Link></li>
                 <li><Link to="/privacidade" className="hover:text-white transition-colors">Política de Privacidade</Link></li>
               </ul>
-            </div>
-            
-            <div>
-              <h4 className="font-semibold mb-4">Contato</h4>
-              <div className="space-y-3 text-gray-400">
-                <div className="flex items-center space-x-2">
-                  <Phone className="h-4 w-4" aria-hidden="true" />
-                  <span>+258 86 318 1415</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Mail className="h-4 w-4" aria-hidden="true" />
-                  <span>contato@lojarapida.co.mz</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <MapPin className="h-4 w-4" aria-hidden="true" />
-                  <span>Maputo, Moçambique</span>
-                </div>
-              </div>
             </div>
           </div>
           
