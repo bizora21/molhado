@@ -74,9 +74,12 @@ const Register = () => {
     setLoading(true);
     
     try {
-      console.log("Iniciando registro do usuário:", formData.email);
+      console.log("🚀 Iniciando processo de registro completo...");
+      console.log("📧 Email:", formData.email);
+      console.log("👤 Nome:", formData.fullName);
       
       // 1. Registrar usuário com Supabase Auth
+      console.log("🔐 Passo 1: Criando usuário no Supabase Auth...");
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
@@ -90,24 +93,56 @@ const Register = () => {
       });
 
       if (authError) {
-        console.error("Erro no auth.signUp:", authError);
+        console.error("❌ Erro no auth.signUp:", authError);
         showError(authError.message || "Erro ao criar conta. Tente novamente.");
         setLoading(false);
         return;
       }
 
-      console.log("Usuário registrado com sucesso:", authData.user);
+      console.log("✅ Usuário criado no Auth:", authData.user);
 
       if (!authData.user) {
-        console.error("Usuário não retornado do auth");
+        console.error("❌ Usuário não retornado do auth");
         showError("Erro ao criar conta. Tente novamente.");
         setLoading(false);
         return;
       }
 
-      // 2. Criar perfil no banco de dados
+      // 2. Fazer login para obter a sessão e o token
+      console.log("🔐 Passo 2: Fazendo login para obter sessão...");
+      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+        email: formData.email,
+        password: formData.password
+      });
+
+      if (signInError) {
+        console.error("❌ Erro no signIn:", signInError);
+        showError("Erro ao fazer login após cadastro. Tente fazer login manualmente.");
+        setLoading(false);
+        return;
+      }
+
+      console.log("✅ Login realizado, sessão obtida");
+
+      // 3. Verificar a sessão atual
+      console.log("🔐 Passo 3: Verificando sessão atual...");
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError || !session) {
+        console.error("❌ Erro ao obter sessão:", sessionError);
+        showError("Erro ao verificar sessão. Tente fazer login manualmente.");
+        setLoading(false);
+        return;
+      }
+
+      console.log("✅ Sessão verificada, User ID:", session.user.id);
+      console.log("✅ Token disponível:", session.access_token ? "Sim" : "Não");
+
+      // 4. Criar perfil no banco de dados com retry e logging detalhado
+      console.log("📝 Passo 4: Criando perfil no banco de dados...");
+      
       const profileData = {
-        user_id: authData.user.id,
+        user_id: session.user.id,
         full_name: formData.fullName,
         phone: formData.phone,
         address: formData.address,
@@ -115,54 +150,102 @@ const Register = () => {
         role: 'cliente'
       };
 
-      console.log("Criando perfil:", profileData);
+      console.log("📊 Dados do perfil a ser inserido:", profileData);
 
-      const { data: profileResult, error: profileError } = await supabase
-        .from('profiles')
-        .insert([profileData])
-        .select();
+      let profileCreated = false;
+      let profileResult = null;
 
-      if (profileError) {
-        console.error("Erro ao criar perfil:", profileError);
+      // Tentativa 1: Inserção direta
+      try {
+        console.log("🔄 Tentativa 1: Inserção direta...");
+        const { data: result, error: error } = await supabase
+          .from('profiles')
+          .insert([profileData])
+          .select();
+
+        if (error) {
+          console.error("❌ Erro na tentativa 1:", error);
+          throw error;
+        }
+
+        console.log("✅ Perfil criado na tentativa 1:", result);
+        profileResult = result;
+        profileCreated = true;
+      } catch (error1) {
+        console.warn("⚠️ Tentativa 1 falhou, tentando novamente após delay...");
         
-        // Se o erro for de RLS, tentamos novamente após um pequeno delay
-        if (profileError.code === '42501') {
-          console.log("Tentando novamente após delay...");
-          await new Promise(resolve => setTimeout(resolve, 1000));
-          
-          const { data: retryResult, error: retryError } = await supabase
+        // Esperar 2 segundos e tentar novamente
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        try {
+          console.log("🔄 Tentativa 2: Inserção após delay...");
+          const { data: result, error: error } = await supabase
             .from('profiles')
             .insert([profileData])
             .select();
-            
-          if (retryError) {
-            console.error("Erro na segunda tentativa:", retryError);
-            showError("Erro ao salvar seus dados. Tente novamente.");
-            setLoading(false);
-            return;
-          } else {
-            console.log("Perfil criado com sucesso na segunda tentativa:", retryResult);
+
+          if (error) {
+            console.error("❌ Erro na tentativa 2:", error);
+            throw error;
           }
-        } else {
-          showError("Erro ao salvar seus dados. Tente novamente.");
-          setLoading(false);
-          return;
+
+          console.log("✅ Perfil criado na tentativa 2:", result);
+          profileResult = result;
+          profileCreated = true;
+        } catch (error2) {
+          console.error("❌ Todas as tentativas falharam:", error2);
+          
+          // Se falhou, vamos tentar um método alternativo usando RPC
+          try {
+            console.log("🔄 Tentativa 3: Usando RPC...");
+            const { data: result, error: error } = await supabase
+              .rpc('create_profile', {
+                p_user_id: session.user.id,
+                p_full_name: formData.fullName,
+                p_phone: formData.phone,
+                p_address: formData.address,
+                p_user_type: 'cliente',
+                p_role: 'cliente'
+              });
+
+            if (error) {
+              console.error("❌ Erro na tentativa 3:", error);
+              throw error;
+            }
+
+            console.log("✅ Perfil criado via RPC:", result);
+            profileResult = result;
+            profileCreated = true;
+          } catch (error3) {
+            console.error("❌ Todas as tentativas falharam completamente:", error3);
+            throw error3;
+          }
         }
-      } else {
-        console.log("Perfil criado com sucesso:", profileResult);
       }
 
-      // 3. Mostrar mensagem de sucesso
+      if (!profileCreated || !profileResult) {
+        throw new Error("Não foi possível criar o perfil após múltiplas tentativas");
+      }
+
+      console.log("🎉 Processo de registro concluído com sucesso!");
+      console.log("📋 Perfil criado:", profileResult);
+
+      // 5. Mostrar mensagem de sucesso
       showSuccess("Cadastro realizado com sucesso! Verifique seu email para confirmar sua conta.");
       
-      // 4. Redirecionar após um pequeno delay
+      // 6. Redirecionar após um pequeno delay
       setTimeout(() => {
         navigate('/login');
       }, 2000);
 
     } catch (error) {
-      console.error("Erro geral no registro:", error);
-      showError("Ocorreu um erro inesperado. Tente novamente.");
+      console.error("❌ Erro geral no registro:", error);
+      
+      if (error.code === '42501') {
+        showError("Erro de permissão ao criar perfil. Por favor, tente novamente em alguns instantes ou contate o suporte.");
+      } else {
+        showError(error.message || "Ocorreu um erro inesperado. Tente novamente.");
+      }
     } finally {
       setLoading(false);
     }
