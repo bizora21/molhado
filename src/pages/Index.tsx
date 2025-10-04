@@ -28,7 +28,11 @@ import {
   Sparkles,
   Target,
   Rocket,
-  Crown
+  Crown,
+  Package,
+  CreditCard,
+  Handshake,
+  Lock
 } from "lucide-react";
 import Chatbot from '@/components/Chatbot';
 
@@ -40,28 +44,28 @@ const Index: React.FC = () => {
     {
       icon: <Store className="h-8 w-8" />,
       title: "Vendedores Locais",
-      description: "Produtos exclusivos de vendedores da sua região com preços competitivos",
+      description: "Conectamos você com os melhores vendedores e comerciantes da sua região",
       color: "text-blue-600",
       bgColor: "bg-blue-50"
     },
     {
       icon: <Wrench className="h-8 w-8" />,
       title: "Serviços Profissionais",
-      description: "Profissionais qualificados e confiáveis para todos os tipos de serviços",
+      description: "Encontre profissionais qualificados e confiáveis para todas as suas necessidades",
       color: "text-green-600",
       bgColor: "bg-green-50"
     },
     {
       icon: <Shield className="h-8 w-8" />,
-      title: "Compra Segura",
-      description: "Transações protegidas com garantia de qualidade e suporte dedicado",
+      title: "Pagamento na Entrega",
+      description: "Pague somente quando receber seu produto. Segurança e confiança garantidas",
       color: "text-purple-600",
       bgColor: "bg-purple-50"
     },
     {
       icon: <Zap className="h-8 w-8" />,
       title: "Entrega Rápida",
-      description: "Receba seus produtos e serviços de forma rápida e eficiente",
+      description: "Receba seus produtos e serviços de forma rápida e eficiente em todo Moçambique",
       color: "text-orange-600",
       bgColor: "bg-orange-50"
     }
@@ -87,20 +91,62 @@ const Index: React.FC = () => {
     {
       name: "Ana Silva",
       role: "Cliente",
-      content: "A melhor plataforma para comprar produtos locais. Entrega sempre no prazo!",
+      content: "A melhor plataforma para comprar produtos locais. Entrega sempre no prazo e pago só quando recebo!",
       rating: 5
     },
     {
       name: "João Mendes",
       role: "Vendedor",
-      content: "Minhas vendas aumentaram 300% desde que me cadastrei na LojaRapida.",
+      content: "A LojaRapida transformou meu negócio. Mais clientes e segurança nas transações.",
       rating: 5
     },
     {
       name: "Maria Santos",
       role: "Prestadora",
-      content: "Encontrei muitos clientes através da plataforma. Excelente ferramenta!",
+      content: "Encontrei muitos clientes através da plataforma. O sistema de pagamento na entrega dá confiança.",
       rating: 5
+    }
+  ];
+
+  const userTypes = [
+    {
+      title: "Para Clientes",
+      description: "Compre com segurança dos melhores vendedores locais",
+      icon: <ShoppingCart className="h-8 w-8" />,
+      color: "from-blue-600 to-blue-700",
+      link: "/register",
+      features: [
+        "Pague na entrega",
+        "Produtos verificados",
+        "Suporte ao cliente",
+        "Devolução garantida"
+      ]
+    },
+    {
+      title: "Para Vendedores",
+      description: "Venda para milhares de clientes em todo Moçambique",
+      icon: <Store className="h-8 w-8" />,
+      color: "from-green-600 to-green-700",
+      link: "/register-vendedor",
+      features: [
+        "Sem taxas de cadastro",
+        "Acesso a 100.000+ clientes",
+        "Pagamento garantido",
+        "Dashboard completo"
+      ]
+    },
+    {
+      title: "Para Prestadores",
+      description: "Ofereça seus serviços e alcance mais clientes",
+      icon: <Wrench className="h-8 w-8" />,
+      color: "from-purple-600 to-purple-700",
+      link: "/register-prestador",
+      features: [
+        "Agendamento online",
+        "Pagamento na prestação",
+        "Avaliações de clientes",
+        "Gestão de serviços"
+      ]
     }
   ];
 
@@ -187,42 +233,29 @@ const Index: React.FC = () => {
         <div className="container mx-auto px-4 py-20 lg:py-32 relative">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="space-y-8">
-              <Badge className="bg-green-100 text-green-800 hover:bg-green-200 w-fit">
-                🚀 A maior plataforma de e-commerce de Moçambique
+              <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-200 w-fit">
+                🛒 A maior plataforma de e-commerce de Moçambique
               </Badge>
               <h1 id="hero-title" className="text-4xl lg:text-6xl font-bold text-gray-900 leading-tight">
-                Transforme Seu 
-                <span className="bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent"> Negócio</span> 
-                <br />em 
-                <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"> Sucesso Digital</span>
+                Conectando 
+                <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"> Negócios</span> 
+                <br />e 
+                <span className="bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent"> Clientes</span> 
+                <br />em Todo Moçambique
               </h1>
               <p className="text-xl text-gray-600 leading-relaxed">
-                Venda para milhares de clientes em toda Moçambique. 
-                Cadastre sua loja GRÁTIS e comece a faturar hoje mesmo!
+                A plataforma mais segura para comprar e vender. 
+                Pague somente na entrega e tenha a garantia de receber exatamente o que comprou.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Link to="/register-vendedor">
-                  <Button size="lg" className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-lg px-8 py-6 shadow-lg transform hover:scale-105 transition-all duration-200">
-                    <Rocket className="h-5 w-5 mr-2" />
-                    Começar a Vender AGORA
-                  </Button>
-                </Link>
-                <Link to="/produtos">
-                  <Button size="lg" variant="outline" className="text-lg px-8 py-6 border-2 hover:bg-gray-50">
-                    <ShoppingCart className="h-5 w-5 mr-2" />
-                    Comprar Produtos
-                  </Button>
-                </Link>
-              </div>
               
               {/* Enhanced Stats */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-8">
                 <div className="text-center p-4 bg-white rounded-lg shadow-sm">
-                  <div className="text-2xl font-bold text-green-600 mb-1">10,000+</div>
+                  <div className="text-2xl font-bold text-blue-600 mb-1">10,000+</div>
                   <div className="text-sm text-gray-600">Vendedores</div>
                 </div>
                 <div className="text-center p-4 bg-white rounded-lg shadow-sm">
-                  <div className="text-2xl font-bold text-blue-600 mb-1">50,000+</div>
+                  <div className="text-2xl font-bold text-green-600 mb-1">50,000+</div>
                   <div className="text-sm text-gray-600">Produtos</div>
                 </div>
                 <div className="text-center p-4 bg-white rounded-lg shadow-sm">
@@ -230,118 +263,88 @@ const Index: React.FC = () => {
                   <div className="text-sm text-gray-600">Clientes</div>
                 </div>
                 <div className="text-center p-4 bg-white rounded-lg shadow-sm">
-                  <div className="text-2xl font-bold text-orange-600 mb-1">300%</div>
-                  <div className="text-sm text-gray-600">Crescimento</div>
+                  <div className="text-2xl font-bold text-orange-600 mb-1">100%</div>
+                  <div className="text-sm text-gray-600">Seguro</div>
                 </div>
               </div>
             </div>
             
             <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-emerald-400 rounded-3xl transform rotate-6 opacity-20"></div>
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-purple-400 rounded-3xl transform rotate-6 opacity-20"></div>
               <div className="relative bg-white rounded-3xl shadow-2xl p-8">
                 <div className="text-center mb-6">
-                  <div className="w-16 h-16 bg-gradient-to-r from-green-600 to-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                    <Crown className="h-8 w-8 text-white" />
+                  <div className="w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <Handshake className="h-8 w-8 text-white" />
                   </div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">Plano Vendedor Premium</h3>
-                  <p className="text-gray-600 mb-4">Comece GRÁTITE hoje!</p>
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">Pagamento na Entrega</h3>
+                  <p className="text-gray-600 mb-4">100% Seguro e Confiável</p>
                 </div>
                 
                 <div className="space-y-4">
                   <div className="flex items-center space-x-3">
                     <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0" />
-                    <span className="text-sm font-medium">0% de comissão nos primeiros 30 dias</span>
+                    <span className="text-sm font-medium">Pague só quando receber</span>
                   </div>
                   <div className="flex items-center space-x-3">
                     <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0" />
-                    <span className="text-sm font-medium">Cadastro em menos de 2 minutos</span>
+                    <span className="text-sm font-medium">Sem risco para o cliente</span>
                   </div>
                   <div className="flex items-center space-x-3">
                     <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0" />
-                    <span className="text-sm font-medium">Acesso a 100,000+ clientes</span>
+                    <span className="text-sm font-medium">Garantia de qualidade</span>
                   </div>
                   <div className="flex items-center space-x-3">
                     <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0" />
-                    <span className="text-sm font-medium">Suporte dedicado 24/7</span>
+                    <span className="text-sm font-medium">Suporte ao cliente</span>
                   </div>
                 </div>
-                
-                <div className="mt-6 text-center">
-                  <Link to="/register-vendedor">
-                    <Button className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-bold py-3">
-                      <Sparkles className="h-4 w-4 mr-2" />
-                      Começar Grátis
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* User Types Section */}
+      <section className="py-20 bg-white" aria-labelledby="usertypes-title">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-200 mb-4">Para Todos</Badge>
+            <h2 id="usertypes-title" className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+              Uma Plataforma para Todos
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Seja você cliente, vendedor ou prestador de serviços, temos a solução ideal para você
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-3 gap-8">
+            {userTypes.map((userType, index) => (
+              <Card key={index} className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                <CardHeader className="text-center pb-6">
+                  <div className={`w-16 h-16 bg-gradient-to-r ${userType.color} rounded-2xl flex items-center justify-center mx-auto mb-4`}>
+                    <div className="text-white">{userType.icon}</div>
+                  </div>
+                  <CardTitle className="text-xl">{userType.title}</CardTitle>
+                  <CardDescription className="text-gray-600">
+                    {userType.description}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    {userType.features.map((feature, idx) => (
+                      <div key={idx} className="flex items-center space-x-2">
+                        <CheckCircle className="h-4 w-4 text-green-600 flex-shrink-0" />
+                        <span className="text-sm text-gray-700">{feature}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <Link to={userType.link} className="block">
+                    <Button className={`w-full bg-gradient-to-r ${userType.color} hover:opacity-90 text-white font-medium`}>
+                      Começar Agora
                     </Button>
                   </Link>
-                  <p className="text-xs text-gray-500 mt-2">Sem cartão de crédito necessário</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Enhanced CTA Section */}
-      <section className="py-16 bg-gradient-to-r from-green-600 to-emerald-600">
-        <div className="container mx-auto px-4 text-center">
-          <div className="max-w-4xl mx-auto">
-            <Badge className="bg-white/20 text-white hover:bg-white/30 mb-4">
-              🎯 OFERTA LIMITADA
-            </Badge>
-            <h2 className="text-4xl lg:text-5xl font-bold text-white mb-6">
-              Não Perca Esta Oportunidade!
-            </h2>
-            <p className="text-xl text-green-100 mb-8 max-w-3xl mx-auto">
-              Junte-se a mais de 10.000 vendedores que já estão lucrando com a LojaRapida. 
-              Cadastre-se HOJE e ganhe 30 dias de comissão ZERO!
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
-              <Link to="/register-vendedor">
-                <Button size="lg" variant="secondary" className="bg-white text-green-600 hover:bg-gray-100 text-lg px-12 py-6 font-bold shadow-xl transform hover:scale-105 transition-all duration-200">
-                  <Target className="h-6 w-6 mr-2" />
-                  QUERO VENDER AGORA!
-                </Button>
-              </Link>
-              <Link to="/register-prestador">
-                <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-green-600 text-lg px-12 py-6 font-bold">
-                  <Wrench className="h-6 w-6 mr-2" />
-                  Quero Oferecer Serviços
-                </Button>
-              </Link>
-            </div>
-            
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 max-w-md mx-auto">
-              <h3 className="text-xl font-semibold text-white mb-4">⏰ Tempo Restante</h3>
-              <div className="text-3xl font-bold text-white mb-4">
-                23:59:59
-              </div>
-              <p className="text-green-100 text-sm">
-                Aproveite esta oferta exclusiva antes que acabe!
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Stats Section */}
-      <section className="py-16 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 id="stats-title" className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-              Números que Impressionam
-            </h2>
-            <p className="text-xl text-gray-600">
-              Resultados reais da nossa comunidade de vendedores
-            </p>
-          </div>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
-            {stats.map((stat, index) => (
-              <div key={index} className="text-center">
-                <div className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
-                  {stat.number}
-                </div>
-                <div className="text-gray-600 mt-2">{stat.label}</div>
-              </div>
+                </CardContent>
+              </Card>
             ))}
           </div>
         </div>
@@ -351,12 +354,12 @@ const Index: React.FC = () => {
       <section className="py-20 bg-gray-50" aria-labelledby="features-title">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-200 mb-4">Por que a LojaRapida?</Badge>
+            <Badge className="bg-green-100 text-green-800 hover:bg-green-200 mb-4">Por que a LojaRapida?</Badge>
             <h2 id="features-title" className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-              A Melhor Plataforma para Vendedores
+              Segurança e Confiança em Primeiro Lugar
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Ferramentas poderosas para impulsionar suas vendas
+              Recursos pensados para proteger tanto clientes quanto vendedores
             </p>
           </div>
           
@@ -380,63 +383,78 @@ const Index: React.FC = () => {
         </div>
       </section>
 
+      {/* Stats Section */}
+      <section className="py-16 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 id="stats-title" className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+              Números que Demonstram Confiança
+            </h2>
+            <p className="text-xl text-gray-600">
+              Resultados reais da nossa comunidade
+            </p>
+          </div>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
+            {stats.map((stat, index) => (
+              <div key={index} className="text-center">
+                <div className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                  {stat.number}
+                </div>
+                <div className="text-gray-600 mt-2">{stat.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Categories Section */}
-      <section className="py-20 bg-white" aria-labelledby="categories-title">
+      <section className="py-20 bg-gray-50" aria-labelledby="categories-title">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <Badge className="bg-purple-100 text-purple-800 hover:bg-purple-200 mb-4">Categorias Populares</Badge>
             <h2 id="categories-title" className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-              Venda em Qualquer Categoria
+              Encontre de Tudo um Pouco
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Encontre o nicho perfeito para o seu negócio
+              Diversas categorias para todas as suas necessidades
             </p>
           </div>
           
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {categories.map((category, index) => (
               <Link key={index} to="/produtos" className="group">
-                <Card className="border border-gray-200 hover:border-green-300 hover:shadow-lg transition-all duration-300">
+                <Card className="border border-gray-200 hover:border-blue-300 hover:shadow-lg transition-all duration-300">
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-4">
                         <div className="text-3xl" aria-hidden="true">{category.icon}</div>
                         <div>
-                          <h3 className="font-semibold text-lg group-hover:text-green-600 transition-colors">
+                          <h3 className="font-semibold text-lg group-hover:text-blue-600 transition-colors">
                             {category.name}
                           </h3>
                           <p className="text-sm text-gray-500">{category.count} produtos</p>
                         </div>
                       </div>
-                      <ChevronRight className="h-5 w-5 text-gray-400 group-hover:text-green-600 transition-colors" aria-hidden="true" />
+                      <ChevronRight className="h-5 w-5 text-gray-400 group-hover:text-blue-600 transition-colors" aria-hidden="true" />
                     </div>
                   </CardContent>
                 </Card>
               </Link>
             ))}
           </div>
-          
-          <div className="text-center mt-12">
-            <Link to="/register-vendedor">
-              <Button size="lg" className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-lg px-8 py-4 font-bold">
-                <Store className="h-5 w-5 mr-2" />
-                Começar a Vender HOJE
-              </Button>
-            </Link>
-          </div>
         </div>
       </section>
 
       {/* Testimonials Section */}
-      <section className="py-20 bg-gray-50" aria-labelledby="testimonials-title">
+      <section className="py-20 bg-white" aria-labelledby="testimonials-title">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <Badge className="bg-green-100 text-green-800 hover:bg-green-200 mb-4">Depoimentos</Badge>
             <h2 id="testimonials-title" className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-              Vendedores que Estão Faturando Alto
+              Quem Confia na LojaRapida
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Histórias reais de sucesso na LojaRapida
+              Histórias reais de sucesso da nossa comunidade
             </p>
           </div>
           
@@ -451,7 +469,7 @@ const Index: React.FC = () => {
                   </div>
                   <p className="text-gray-700 mb-4 italic">"{testimonial.content}"</p>
                   <div className="flex items-center">
-                    <div className="w-10 h-10 bg-gradient-to-r from-green-600 to-emerald-600 rounded-full flex items-center justify-center mr-3">
+                    <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center mr-3">
                       <span className="text-white font-semibold">
                         {testimonial.name.charAt(0)}
                       </span>
@@ -469,41 +487,34 @@ const Index: React.FC = () => {
       </section>
 
       {/* Final CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-green-600 to-emerald-600" aria-labelledby="cta-title">
+      <section className="py-20 bg-gradient-to-r from-blue-600 to-purple-600" aria-labelledby="cta-title">
         <div className="container mx-auto px-4 text-center">
           <div className="max-w-3xl mx-auto">
             <h2 id="cta-title" className="text-4xl lg:text-5xl font-bold text-white mb-6">
-              Está Pronto para Aumentar Suas Vendas?
+              Pronto para Fazer Parte da Nossa Comunidade?
             </h2>
-            <p className="text-xl text-green-100 mb-8">
-              Junte-se a milhares de vendedores que já transformaram seus negócios com a LojaRapida
+            <p className="text-xl text-blue-100 mb-8">
+              Junte-se a milhares de clientes, vendedores e prestadores que já confiam na LojaRapida
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
-              <Link to="/register-vendedor">
-                <Button size="lg" variant="secondary" className="bg-white text-green-600 hover:bg-gray-100 text-lg px-12 py-6 font-bold shadow-xl transform hover:scale-105 transition-all duration-200">
-                  <Rocket className="h-6 w-6 mr-2" />
-                  COMEÇAR A VENDER AGORA
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link to="/register">
+                <Button size="lg" variant="secondary" className="bg-white text-blue-600 hover:bg-gray-100 text-lg px-8 py-4 font-bold">
+                  <Users className="h-5 w-5 mr-2" />
+                  Cadastre-se como Cliente
                 </Button>
               </Link>
-            </div>
-            
-            {/* Enhanced Newsletter */}
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 max-w-md mx-auto">
-              <h3 className="text-xl font-semibold text-white mb-4">🎁 Receba Dicas Exclusivas</h3>
-              <p className="text-green-100 mb-4">Ganhe 50% de desconto na primeira taxa!</p>
-              <form className="flex gap-2" onSubmit={(e) => e.preventDefault()}>
-                <Input
-                  type="email"
-                  placeholder="Seu email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="bg-white/90 placeholder-gray-500 flex-1"
-                  aria-label="Email para newsletter"
-                />
-                <Button type="submit" className="bg-white text-green-600 hover:bg-gray-100 font-bold">
-                  Receber
+              <Link to="/register-vendedor">
+                <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-blue-600 text-lg px-8 py-4 font-bold">
+                  <Store className="h-5 w-5 mr-2" />
+                  Cadastre-se como Vendedor
                 </Button>
-              </form>
+              </Link>
+              <Link to="/register-prestador">
+                <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-blue-600 text-lg px-8 py-4 font-bold">
+                  <Wrench className="h-5 w-5 mr-2" />
+                  Cadastre-se como Prestador
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
@@ -521,7 +532,7 @@ const Index: React.FC = () => {
                 <span className="text-2xl font-bold">LojaRapida</span>
               </div>
               <p className="text-gray-400 mb-4">
-                A maior plataforma de e-commerce e serviços de Moçambique
+                A plataforma mais segura de e-commerce e serviços de Moçambique
               </p>
               <div className="flex space-x-4">
                 <Facebook className="h-5 w-5 text-gray-400 hover:text-white cursor-pointer" aria-label="Facebook" />
