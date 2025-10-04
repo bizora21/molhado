@@ -5,7 +5,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Eye, EyeOff, User, Store, Wrench } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Eye, EyeOff, User, Store, Wrench, ArrowRight, Shield, Zap } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { showSuccess, showError } from "@/utils/toast";
 
@@ -31,7 +32,6 @@ const Login = () => {
         return;
       }
 
-      // Get user profile to determine user type
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('user_type')
@@ -43,7 +43,6 @@ const Login = () => {
         return;
       }
 
-      // Redirect based on user type
       switch (profile.user_type) {
         case 'cliente':
           navigate('/cliente-dashboard');
@@ -74,199 +73,208 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div className="text-center">
-          <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
-            Entrar na LojaRapida
-          </h2>
-          <p className="mt-2 text-sm text-gray-600">
-            Ou{' '}
-            <Link to="/register" className="font-medium text-blue-600 hover:text-blue-500">
-              crie uma nova conta
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+      {/* Header */}
+      <header className="bg-white/80 backdrop-blur-sm border-b sticky top-0 z-50">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <Link to="/" className="flex items-center space-x-2">
+              <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+                <Store className="h-5 w-5 text-white" />
+              </div>
+              <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">LojaRapida</span>
             </Link>
-          </p>
+            <Link to="/register" className="text-blue-600 hover:text-blue-700 font-medium">
+              Não tem conta? Cadastre-se
+            </Link>
+          </div>
         </div>
+      </header>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-center">Escolha seu tipo de conta</CardTitle>
-            <CardDescription className="text-center">
-              Selecione como você quer acessar a plataforma
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Tabs defaultValue="cliente" className="w-full">
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="cliente" className="flex items-center gap-2">
-                  <User className="h-4 w-4" />
-                  Cliente
-                </TabsTrigger>
-                <TabsTrigger value="vendedor" className="flex items-center gap-2">
-                  <Store className="h-4 w-4" />
-                  Vendedor
-                </TabsTrigger>
-                <TabsTrigger value="prestador" className="flex items-center gap-2">
-                  <Wrench className="h-4 w-4" />
-                  Prestador
-                </TabsTrigger>
-              </TabsList>
+      <div className="container mx-auto px-4 py-12">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Left Side - Welcome Message */}
+            <div className="space-y-8">
+              <div>
+                <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-200 mb-4">Bem-vindo de volta</Badge>
+                <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
+                  Entre na maior comunidade de 
+                  <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"> compras</span> 
+                  <br />de Moçambique
+                </h1>
+                <p className="text-xl text-gray-600 leading-relaxed">
+                  Acesse sua conta para continuar comprando dos melhores vendedores locais
+                </p>
+              </div>
 
-              <TabsContent value="cliente" className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    name="email"
-                    type="email"
-                    required
-                    placeholder="seu@email.com"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="password">Senha</Label>
-                  <div className="relative">
-                    <Input
-                      id="password"
-                      name="password"
-                      type={showPassword ? "text" : "password"}
-                      required
-                      placeholder="••••••••"
-                      value={formData.password}
-                      onChange={handleInputChange}
-                    />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                      onClick={() => setShowPassword(!showPassword)}
-                    >
-                      {showPassword ? (
-                        <EyeOff className="h-4 w-4" />
-                      ) : (
-                        <Eye className="h-4 w-4" />
-                      )}
-                    </Button>
+              <div className="space-y-6">
+                <div className="flex items-start space-x-4">
+                  <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Shield className="h-6 w-6 text-blue-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-lg mb-1">Acesso Seguro</h3>
+                    <p className="text-gray-600">Seus dados estão protegidos com criptografia avançada</p>
                   </div>
                 </div>
-                <Button 
-                  className="w-full" 
-                  onClick={() => handleLogin('cliente')}
-                  disabled={loading}
-                >
-                  {loading ? "Entrando..." : "Entrar como Cliente"}
-                </Button>
-              </TabsContent>
 
-              <TabsContent value="vendedor" className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="email-vendedor">Email</Label>
-                  <Input
-                    id="email-vendedor"
-                    name="email"
-                    type="email"
-                    required
-                    placeholder="sua@loja.com"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="password-vendedor">Senha</Label>
-                  <div className="relative">
-                    <Input
-                      id="password-vendedor"
-                      name="password"
-                      type={showPassword ? "text" : "password"}
-                      required
-                      placeholder="••••••••"
-                      value={formData.password}
-                      onChange={handleInputChange}
-                    />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                      onClick={() => setShowPassword(!showPassword)}
-                    >
-                      {showPassword ? (
-                        <EyeOff className="h-4 w-4" />
-                      ) : (
-                        <Eye className="h-4 w-4" />
-                      )}
-                    </Button>
+                <div className="flex items-start space-x-4">
+                  <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Zap className="h-6 w-6 text-purple-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-lg mb-1">Acesso Rápido</h3>
+                    <p className="text-gray-600">Entre em segundos e continue de onde parou</p>
                   </div>
                 </div>
-                <Button 
-                  className="w-full" 
-                  onClick={() => handleLogin('vendedor')}
-                  disabled={loading}
-                >
-                  {loading ? "Entrando..." : "Entrar como Vendedor"}
-                </Button>
-              </TabsContent>
+              </div>
 
-              <TabsContent value="prestador" className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="email-prestador">Email</Label>
-                  <Input
-                    id="email-prestador"
-                    name="email"
-                    type="email"
-                    required
-                    placeholder="seu@servico.com"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="password-prestador">Senha</Label>
-                  <div className="relative">
-                    <Input
-                      id="password-prestador"
-                      name="password"
-                      type={showPassword ? "text" : "password"}
-                      required
-                      placeholder="••••••••"
-                      value={formData.password}
-                      onChange={handleInputChange}
-                    />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                      onClick={() => setShowPassword(!showPassword)}
-                    >
-                      {showPassword ? (
-                        <EyeOff className="h-4 w-4" />
-                      ) : (
-                        <Eye className="h-4 w-4" />
-                      )}
-                    </Button>
-                  </div>
-                </div>
-                <Button 
-                  className="w-full" 
-                  onClick={() => handleLogin('prestador')}
-                  disabled={loading}
-                >
-                  {loading ? "Entrando..." : "Entrar como Prestador"}
-                </Button>
-              </TabsContent>
-            </Tabs>
-
-            <div className="mt-6 text-center">
-              <Link to="/forgot-password" className="text-sm text-blue-600 hover:text-blue-500">
-                Esqueceu sua senha?
-              </Link>
+              <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-6 text-white">
+                <h3 className="font-semibold text-lg mb-2">Novo na LojaRapida?</h3>
+                <p className="text-blue-100 mb-4">Junte-se a 100,000+ clientes satisfeitos</p>
+                <Link to="/register">
+                  <Button variant="secondary" className="bg-white text-blue-600 hover:bg-gray-100">
+                    Criar Conta Gratuita
+                    <ArrowRight className="h-4 w-4 ml-2" />
+                  </Button>
+                </Link>
+              </div>
             </div>
-          </CardContent>
-        </Card>
+
+            {/* Right Side - Login Form */}
+            <div>
+              <Card className="shadow-2xl border-0">
+                <CardHeader className="text-center pb-6">
+                  <div className="w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <User className="h-8 w-8 text-white" />
+                  </div>
+                  <CardTitle className="text-2xl">Entrar na Conta</CardTitle>
+                  <CardDescription>
+                    Escolha seu tipo de conta para continuar
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="px-8 pb-8">
+                  <Tabs defaultValue="cliente" className="w-full">
+                    <TabsList className="grid w-full grid-cols-3 mb-8">
+                      <TabsTrigger value="cliente" className="flex items-center gap-2">
+                        <User className="h-4 w-4" />
+                        Cliente
+                      </TabsTrigger>
+                      <TabsTrigger value="vendedor" className="flex items-center gap-2">
+                        <Store className="h-4 w-4" />
+                        Vendedor
+                      </TabsTrigger>
+                      <TabsTrigger value="prestador" className="flex items-center gap-2">
+                        <Wrench className="h-4 w-4" />
+                        Prestador
+                      </TabsTrigger>
+                    </TabsList>
+
+                    <form onSubmit={(e) => e.preventDefault()} className="space-y-6">
+                      <div className="space-y-4">
+                        <div>
+                          <Label htmlFor="email">Email</Label>
+                          <Input
+                            id="email"
+                            name="email"
+                            type="email"
+                            required
+                            placeholder="seu@email.com"
+                            value={formData.email}
+                            onChange={handleInputChange}
+                            className="h-12"
+                          />
+                        </div>
+
+                        <div>
+                          <Label htmlFor="password">Senha</Label>
+                          <div className="relative">
+                            <Input
+                              id="password"
+                              name="password"
+                              type={showPassword ? "text" : "password"}
+                              required
+                              placeholder="••••••••"
+                              value={formData.password}
+                              onChange={handleInputChange}
+                              className="h-12 pr-12"
+                            />
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
+                              onClick={() => setShowPassword(!showPassword)}
+                            >
+                              {showPassword ? (
+                                <EyeOff className="h-4 w-4" />
+                              ) : (
+                                <Eye className="h-4 w-4" />
+                              )}
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between">
+                        <label className="flex items-center space-x-2">
+                          <input
+                            type="checkbox"
+                            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                          />
+                          <span className="text-sm text-gray-600">Lembrar de mim</span>
+                        </label>
+                        <Link to="/forgot-password" className="text-sm text-blue-600 hover:text-blue-500">
+                          Esqueceu a senha?
+                        </Link>
+                      </div>
+
+                      <TabsContent value="cliente" className="mt-6">
+                        <Button 
+                          className="w-full h-12 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700" 
+                          onClick={() => handleLogin('cliente')}
+                          disabled={loading}
+                        >
+                          {loading ? "Entrando..." : "Entrar como Cliente"}
+                        </Button>
+                      </TabsContent>
+
+                      <TabsContent value="vendedor" className="mt-6">
+                        <Button 
+                          className="w-full h-12 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700" 
+                          onClick={() => handleLogin('vendedor')}
+                          disabled={loading}
+                        >
+                          {loading ? "Entrando..." : "Entrar como Vendedor"}
+                        </Button>
+                      </TabsContent>
+
+                      <TabsContent value="prestador" className="mt-6">
+                        <Button 
+                          className="w-full h-12 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700" 
+                          onClick={() => handleLogin('prestador')}
+                          disabled={loading}
+                        >
+                          {loading ? "Entrando..." : "Entrar como Prestador"}
+                        </Button>
+                      </TabsContent>
+                    </form>
+
+                    <div className="mt-8 text-center">
+                      <p className="text-sm text-gray-600">
+                        Não tem uma conta?{' '}
+                        <Link to="/register" className="font-medium text-blue-600 hover:text-blue-500">
+                          Cadastre-se gratuitamente
+                        </Link>
+                      </p>
+                    </div>
+                  </Tabs>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
