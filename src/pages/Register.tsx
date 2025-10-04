@@ -119,24 +119,38 @@ const Register = () => {
 
       const { data: profileResult, error: profileError } = await supabase
         .from('profiles')
-        .insert([profileData]);
+        .insert([profileData])
+        .select();
 
       if (profileError) {
         console.error("Erro ao criar perfil:", profileError);
-        showError("Erro ao salvar seus dados. Tente novamente.");
         
-        // Tentar deletar o usuário criado para não deixar conta órfã
-        try {
-          await supabase.auth.admin.deleteUser(authData.user.id);
-        } catch (deleteError) {
-          console.error("Erro ao deletar usuário:", deleteError);
+        // Se o erro for de RLS, tentamos novamente após um pequeno delay
+        if (profileError.code === '42501') {
+          console.log("Tentando novamente após delay...");
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          
+          const { data: retryResult, error: retryError } = await supabase
+            .from('profiles')
+            .insert([profileData])
+            .select();
+            
+          if (retryError) {
+            console.error("Erro na segunda tentativa:", retryError);
+            showError("Erro ao salvar seus dados. Tente novamente.");
+            setLoading(false);
+            return;
+          } else {
+            console.log("Perfil criado com sucesso na segunda tentativa:", retryResult);
+          }
+        } else {
+          showError("Erro ao salvar seus dados. Tente novamente.");
+          setLoading(false);
+          return;
         }
-        
-        setLoading(false);
-        return;
+      } else {
+        console.log("Perfil criado com sucesso:", profileResult);
       }
-
-      console.log("Perfil criado com sucesso:", profileResult);
 
       // 3. Mostrar mensagem de sucesso
       showSuccess("Cadastro realizado com sucesso! Verifique seu email para confirmar sua conta.");
