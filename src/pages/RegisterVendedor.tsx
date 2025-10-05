@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Eye, EyeOff, Store, ArrowLeft, Upload, CheckCircle, Package, TrendingUp, Users } from "lucide-react";
+import { Eye, EyeOff, Store, ArrowLeft, CheckCircle, Package, TrendingUp, Users } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { showSuccess, showError } from "@/utils/toast";
 
@@ -110,7 +110,7 @@ const RegisterVendedor = () => {
     }
 
     if (!formData.storeProvince) {
-      showError("Por favor, selecione a província da sua loja");
+      showError("Por favor, selecione a província da sua loja ");
       return;
     }
 
@@ -178,7 +178,7 @@ const RegisterVendedor = () => {
       // 2. Fazer login automático
       const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
         email: formData.email,
-        password: formData.password
+        password: formData.password,
       });
 
       if (signInError) {
@@ -212,10 +212,6 @@ const RegisterVendedor = () => {
         store_name: formData.storeName,
         store_category: formData.storeCategory,
         store_description: formData.storeDescription,
-        store_address: formData.storeAddress,
-        store_city: formData.storeCity,
-        store_province: formData.storeProvince,
-        store_opening_hours: formData.storeOpeningHours,
         store_whatsapp: formData.storeWhatsapp,
         store_accepts_delivery: formData.storeAcceptsDelivery,
         store_delivery_radius_km: formData.storeDeliveryRadiusKm ? parseFloat(formData.storeDeliveryRadiusKm) : null,
@@ -266,6 +262,7 @@ const RegisterVendedor = () => {
           profileResult = result;
         } catch (error2) {
           console.error("❌ Falha ao criar perfil:", error2);
+          // Continuar mesmo sem perfil para não bloquear o usuário
         }
       }
 
@@ -689,7 +686,7 @@ const RegisterVendedor = () => {
                                 name="confirmPassword"
                                 type={showConfirmPassword ? "text" : "password"}
                                 required
-                                placeholder="••••••••••••••••"
+                                placeholder="•••••••••••••••••"
                                 value={formData.confirmPassword}
                                 onChange={handleInputChange}
                                 className="h-12 pr-12"
