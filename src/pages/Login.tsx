@@ -5,7 +5,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
 import { Eye, EyeOff, User, Store, Wrench, ArrowRight, Shield, Zap } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { showSuccess, showError } from "@/utils/toast";
@@ -60,7 +59,7 @@ const Login = () => {
         return;
       }
 
-      console.log("✅ Login bem-sucedido:", authData.user);
+      console.log("✅ Login bem-sucedido no Auth:", authData.user);
 
       if (!authData.user) {
         console.error("❌ Usuário não encontrado nos dados de autenticação");
@@ -114,21 +113,52 @@ const Login = () => {
 
       console.log("✅ Perfil encontrado:", profile);
 
-      // 4. Verificar se o tipo de usuário corresponde ao perfil
+      // 4. Verificação melhorada do tipo de usuário
+      // Se o perfil não tiver user_type definido, usar o selecionado
+      const profileUserType = profile.user_type || userType;
+      
+      // Se o perfil tiver user_type mas for diferente, mostrar erro
       if (profile.user_type && profile.user_type !== userType) {
         console.error("❌ Tipo de usuário selecionado não corresponde ao perfil");
+        console.error("❌ Perfil user_type:", profile.user_type);
+        console.error("❌ Selecionado userType:", userType);
         showError(`Este email está registrado como ${profile.user_type}, mas você selecionou ${userType}.`);
         setLoading(false);
         return;
       }
 
-      // 5. Login bem-sucedido
+      // 5. Verificação adicional para perfis incompletos
+      if (profileUserType === 'vendedor') {
+        const requiredFields = ['store_name', 'store_category', 'store_description', 'store_opening_hours'];
+        const missingFields = requiredFields.filter(field => !profile[field]);
+        
+        if (missingFields.length > 0) {
+          console.error("❌ Perfil de vendedor incompleto:", missingFields);
+          showError("Seu perfil de vendedor está incompleto. Por favor, complete seu cadastro.");
+          setLoading(false);
+          return;
+        }
+      }
+
+      if (profileUserType === 'prestador') {
+        const requiredFields = ['professional_name', 'professional_profession', 'professional_category', 'professional_description'];
+        const missingFields = requiredFields.filter(field => !profile[field]);
+        
+        if (missingFields.length > 0) {
+          console.error("❌ Perfil de prestador incompleto:", missingFields);
+          showError("Seu perfil de prestador está incompleto. Por favor, complete seu cadastro.");
+          setLoading(false);
+          return;
+        }
+      }
+
+      // 6. Login bem-sucedido
       const displayName = profile?.full_name || profile?.store_name || profile?.professional_name || 'Usuário';
       showSuccess(`Bem-vindo de volta, ${displayName}!`);
       
-      // 6. Redirecionar para o dashboard correto
+      // 7. Redirecionar para o dashboard correto
       setTimeout(() => {
-        switch (userType) {
+        switch (profileUserType) {
           case 'cliente':
             navigate('/cliente-dashboard');
             break;
@@ -197,7 +227,9 @@ const Login = () => {
             {/* Left Side - Welcome Message */}
             <div className="space-y-8">
               <div>
-                <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-200 mb-4">Bem-vindo de volta</Badge>
+                <div className="bg-blue-100 text-blue-800 hover:bg-blue-200 mb-4 w-fit px-3 py-1 rounded-full text-sm font-medium">
+                  Bem-vindo de volta
+                </div>
                 <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
                   Entre na sua conta e 
                   <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"> continue</span>
@@ -298,7 +330,7 @@ const Login = () => {
                               name="password"
                               type={showPassword ? "text" : "password"}
                               required
-                              placeholder="•••••••••••"
+                              placeholder="••••••••••••"
                               value={formData.password}
                               onChange={handleInputChange}
                               className="h-12 pr-12"
