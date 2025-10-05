@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Eye, EyeOff, Store, ArrowLeft, Upload, CheckCircle } from "lucide-react";
+import { Eye, EyeOff, Store, ArrowLeft, Upload, CheckCircle, Package, TrendingUp, Users } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { showSuccess, showError } from "@/utils/toast";
 
@@ -23,6 +23,8 @@ const RegisterVendedor = () => {
     storeCategory: "",
     storeDescription: "",
     storeAddress: "",
+    storeCity: "",
+    storeProvince: "",
     storeOpeningHours: "",
     storeWhatsapp: "",
     storeAcceptsDelivery: false,
@@ -33,16 +35,39 @@ const RegisterVendedor = () => {
   });
   const navigate = useNavigate();
 
-  const benefits = [
-    { icon: <CheckCircle className="h-6 w-6" />, title: "Venda Imediata", description: "Comece a vender assim que se cadastrar" },
-    { icon: <CheckCircle className="h-6 w-6" />, title: "Gestão Simples", description: "Painel intuitivo para gerenciar seus produtos" },
-    { icon: <CheckCircle className="h-6 w-6" />, title: "Alcance Ampliado", description: "Acesse milhares de clientes em Moçambique" }
+  const sellerBenefits = [
+    { icon: <Package className="h-6 w-6" />, title: "Venda Imediata", description: "Comece a vender assim que se cadastrar" },
+    { icon: <TrendingUp className="h-6 w-6" />, title: "Amplo Mercado", description: "Acesse mais de 100.000 clientes em todo Moçambique" },
+    { icon: <Users className="h-6 w-6" />, title: "Pagamento Garantido", description: "Receba pagamentos na entrega dos produtos" },
+    { icon: <Store className="h-6 w-6" />, title: "Dashboard Completo", description: "Gerencie seus produtos e vendas online" }
+  ];
+
+  const storeCategories = [
+    "Alimentos e Bebidas",
+    "Roupas e Acessórios", 
+    "Eletrônicos e Celulares",
+    "Móveis e Decoração",
+    "Saúde e Beleza",
+    "Esportes e Lazer",
+    "Livros e Papelaria",
+    "Brinquedos e Jogos",
+    "Automotivo e Peças",
+    "Ferramentas e Construção",
+    "Casa e Jardim",
+    "Informática e Tecnologia",
+    "Bebês e Crianças",
+    "Pet Shop",
+    "Outros"
+  ];
+
+  const provinces = [
+    "Maputo", "Matola", "Xai-Xai", "Inhambane", "Maxixe", "Chimoio", "Beira", "Tete", "Quelimane", "Nampula", "Pemba", "Lichinga"
   ];
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validações mais rigorosas
+    // Validações específicas para vendedor
     if (!formData.fullName.trim()) {
       showError("Por favor, preencha seu nome completo");
       return;
@@ -68,8 +93,23 @@ const RegisterVendedor = () => {
       return;
     }
 
+    if (!formData.storeDescription.trim()) {
+      showError("Por favor, descreva sua loja e produtos");
+      return;
+    }
+
     if (!formData.storeAddress.trim()) {
       showError("Por favor, preencha o endereço da sua loja");
+      return;
+    }
+
+    if (!formData.storeCity.trim()) {
+      showError("Por favor, preencha a cidade da sua loja");
+      return;
+    }
+
+    if (!formData.storeProvince) {
+      showError("Por favor, selecione a província da sua loja");
       return;
     }
 
@@ -93,7 +133,6 @@ const RegisterVendedor = () => {
       return;
     }
 
-    // Validação de email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
       showError("Por favor, insira um email válido");
@@ -103,7 +142,7 @@ const RegisterVendedor = () => {
     setLoading(true);
     
     try {
-      console.log("🚀 Iniciando registro do vendedor:", formData.email);
+      console.log("🏪 Iniciando cadastro de VENDEDOR:", formData.email);
       
       // 1. Registrar usuário com Supabase Auth
       const { data: authData, error: authError } = await supabase.auth.signUp({
@@ -113,7 +152,8 @@ const RegisterVendedor = () => {
           data: {
             full_name: formData.fullName,
             phone: formData.phone,
-            user_type: 'vendedor'
+            user_type: 'vendedor',
+            role: 'vendedor'
           }
         }
       });
@@ -125,7 +165,7 @@ const RegisterVendedor = () => {
         return;
       }
 
-      console.log("✅ Vendedor registrado com sucesso:", authData.user);
+      console.log("✅ Vendedor criado no Auth:", authData.user);
 
       if (!authData.user) {
         console.error("❌ Usuário não retornado do auth");
@@ -134,8 +174,7 @@ const RegisterVendedor = () => {
         return;
       }
 
-      // 2. Fazer login automático para obter sessão
-      console.log("🔐 Passo 2: Fazendo login automático...");
+      // 2. Fazer login automático
       const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
         email: formData.email,
         password: formData.password
@@ -150,8 +189,7 @@ const RegisterVendedor = () => {
 
       console.log("✅ Login automático realizado");
 
-      // 3. Verificar a sessão atual
-      console.log("🔐 Passo 3: Verificando sessão atual...");
+      // 3. Verificar sessão
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
       
       if (sessionError || !session) {
@@ -163,9 +201,7 @@ const RegisterVendedor = () => {
 
       console.log("✅ Sessão verificada, User ID:", session.user.id);
 
-      // 4. Criar perfil no banco de dados
-      console.log("📝 Passo 4: Criando perfil no banco de dados...");
-      
+      // 4. Criar perfil de vendedor no banco
       const profileData = {
         user_id: session.user.id,
         full_name: formData.fullName,
@@ -176,17 +212,17 @@ const RegisterVendedor = () => {
         store_category: formData.storeCategory,
         store_description: formData.storeDescription,
         store_address: formData.storeAddress,
+        store_city: formData.storeCity,
+        store_province: formData.storeProvince,
         store_opening_hours: formData.storeOpeningHours,
         store_whatsapp: formData.storeWhatsapp,
         store_accepts_delivery: formData.storeAcceptsDelivery,
         store_delivery_radius_km: formData.storeDeliveryRadiusKm ? parseFloat(formData.storeDeliveryRadiusKm) : null,
-        store_delivery_fee: formData.storeDeliveryFee ? parseFloat(formData.storeDeliveryFee) : null,
-        email_confirmed_at: new Date().toISOString()
+        store_delivery_fee: formData.storeDeliveryFee ? parseFloat(formData.storeDeliveryFee) : null
       };
 
-      console.log("📊 Dados do perfil a ser inserido:", profileData);
+      console.log("📊 Dados do perfil VENDEDOR:", profileData);
 
-      let profileCreated = false;
       let profileResult = null;
 
       // Tentativa 1: Inserção direta
@@ -202,15 +238,14 @@ const RegisterVendedor = () => {
           throw error;
         }
 
-        console.log("✅ Perfil criado na tentativa 1:", result);
+        console.log("✅ Perfil de vendedor criado:", result);
         profileResult = result;
-        profileCreated = true;
       } catch (error1) {
         console.warn("⚠️ Tentativa 1 falhou, tentando RPC...");
         
         // Tentativa 2: Usar RPC
         try {
-          console.log("🔄 Tentativa 2: Usando RPC simples...");
+          console.log("🔄 Tentativa 2: Usando RPC...");
           const { data: result, error: error } = await supabase
             .rpc('create_profile_simple', {
               p_user_id: session.user.id,
@@ -226,29 +261,24 @@ const RegisterVendedor = () => {
             throw error;
           }
 
-          console.log("✅ Perfil criado via RPC:", result);
+          console.log("✅ Perfil de vendedor criado via RPC:", result);
           profileResult = result;
-          profileCreated = true;
         } catch (error2) {
-          console.error("❌ Todas as tentativas falharam:", error2);
-          // Não vamos bloquear o registro por causa do perfil
-          profileCreated = false;
+          console.error("❌ Falha ao criar perfil:", error2);
         }
       }
 
-      console.log("🎉 Processo de registro concluído com sucesso!");
-      console.log("📋 Perfil criado:", profileResult);
-
-      // 5. Mostrar mensagem de sucesso definitiva
-      showSuccess("Cadastro realizado com sucesso! Você já pode acessar o sistema.");
+      console.log("🎉 Cadastro de VENDEDOR concluído com sucesso!");
       
-      // 6. Redirecionar após um pequeno delay
+      showSuccess("Loja cadastrada com sucesso! Você já pode começar a vender.");
+      
+      // 5. Redirecionar para dashboard do vendedor
       setTimeout(() => {
         navigate('/vendedor-dashboard');
       }, 2000);
 
     } catch (error) {
-      console.error("❌ Erro geral no registro:", error);
+      console.error("❌ Erro geral no cadastro:", error);
       showError(error.message || "Ocorreu um erro inesperado. Tente novamente.");
     } finally {
       setLoading(false);
@@ -303,24 +333,26 @@ const RegisterVendedor = () => {
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-6xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
-            {/* Left Side - Benefits */}
+            {/* Left Side - Seller Benefits */}
             <div className="space-y-8">
               <div>
-                <div className="bg-green-100 text-green-800 hover:bg-green-200 mb-4 w-fit px-3 py-1 rounded-full text-sm font-medium">
-                  Cadastre-se como Vendedor
-                </div>
+                <Badge className="bg-green-100 text-green-800 hover:bg-green-200 mb-4">
+                  <Store className="h-4 w-4 mr-2" />
+                  Cadastro de Vendedor
+                </Badge>
                 <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
-                  Venda seus produtos para 
-                  <span className="bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent"> milhares</span> 
-                  <br />de clientes em Moçambique
+                  Abra sua loja online e 
+                  <span className="bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent"> alcance</span> 
+                  <br />milhares de clientes
                 </h1>
                 <p className="text-xl text-gray-600 leading-relaxed">
-                  Crie sua loja online em minutos e comece a vender imediatamente
+                  Cadastre sua loja e comece a vender para todo Moçambique. 
+                  Sem taxas de cadastro e pagamento garantido na entrega.
                 </p>
               </div>
 
               <div className="space-y-6">
-                {benefits.map((benefit, index) => (
+                {sellerBenefits.map((benefit, index) => (
                   <div key={index} className="flex items-start space-x-4">
                     <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
                       <div className="text-green-600">{benefit.icon}</div>
@@ -353,7 +385,7 @@ const RegisterVendedor = () => {
                   </div>
                   <CardTitle className="text-2xl">Cadastrar sua Loja</CardTitle>
                   <CardDescription>
-                    Preencha os dados para começar a vender
+                    Cadastre sua loja para começar a vender online
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="px-8 pb-8">
@@ -399,7 +431,7 @@ const RegisterVendedor = () => {
                         </div>
 
                         <div>
-                          <Label htmlFor="email">Email</Label>
+                          <Label htmlFor="email">Email da Loja</Label>
                           <Input
                             id="email"
                             name="email"
@@ -413,7 +445,7 @@ const RegisterVendedor = () => {
                         </div>
 
                         <div>
-                          <Label htmlFor="phone">Telefone</Label>
+                          <Label htmlFor="phone">Telefone da Loja</Label>
                           <Input
                             id="phone"
                             name="phone"
@@ -460,14 +492,9 @@ const RegisterVendedor = () => {
                               <SelectValue placeholder="Selecione uma categoria" />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="alimentos">Alimentos e Bebidas</SelectItem>
-                              <SelectItem value="roupas">Roupas e Acessórios</SelectItem>
-                              <SelectItem value="eletronicos">Eletrônicos</SelectItem>
-                              <SelectItem value="moveis">Móveis e Decoração</SelectItem>
-                              <SelectItem value="saude">Saúde e Beleza</SelectItem>
-                              <SelectItem value="esportes">Esportes e Lazer</SelectItem>
-                              <SelectItem value="livros">Livros e Papelaria</SelectItem>
-                              <SelectItem value="outros">Outros</SelectItem>
+                              {storeCategories.map(category => (
+                                <SelectItem key={category} value={category}>{category}</SelectItem>
+                              ))}
                             </SelectContent>
                           </Select>
                         </div>
@@ -492,7 +519,7 @@ const RegisterVendedor = () => {
                             name="storeAddress"
                             type="text"
                             required
-                            placeholder="Av. Julius Nyerere, 1234, Maputo"
+                            placeholder="Av. Julius Nyerere, 1234"
                             value={formData.storeAddress}
                             onChange={handleInputChange}
                             className="h-12"
@@ -523,6 +550,39 @@ const RegisterVendedor = () => {
 
                     {step === 3 && (
                       <div className="space-y-4 animate-in slide-in-from-right">
+                        <div className="grid md:grid-cols-2 gap-4">
+                          <div>
+                            <Label htmlFor="storeCity">Cidade</Label>
+                            <Input
+                              id="storeCity"
+                              name="storeCity"
+                              type="text"
+                              required
+                              placeholder="Maputo"
+                              value={formData.storeCity}
+                              onChange={handleInputChange}
+                              className="h-12"
+                            />
+                          </div>
+
+                          <div>
+                            <Label htmlFor="storeProvince">Província</Label>
+                            <select
+                              id="storeProvince"
+                              name="storeProvince"
+                              required
+                              value={formData.storeProvince}
+                              onChange={handleInputChange}
+                              className="w-full h-12 px-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                            >
+                              <option value="">Selecione uma província</option>
+                              {provinces.map(province => (
+                                <option key={province} value={province}>{province}</option>
+                              ))}
+                            </select>
+                          </div>
+                        </div>
+
                         <div>
                           <Label htmlFor="storeOpeningHours">Horário de Funcionamento</Label>
                           <Input
@@ -538,7 +598,7 @@ const RegisterVendedor = () => {
                         </div>
 
                         <div>
-                          <Label htmlFor="storeWhatsapp">WhatsApp</Label>
+                          <Label htmlFor="storeWhatsapp">WhatsApp da Loja</Label>
                           <Input
                             id="storeWhatsapp"
                             name="storeWhatsapp"
@@ -693,17 +753,17 @@ const RegisterVendedor = () => {
                     )}
                   </form>
 
-                  <div className="mt-8 text-center">
-                    <p className="text-sm text-gray-600">
-                      Quer comprar produtos ou contratar serviços?{' '}
-                      <Link to="/register" className="font-medium text-green-600 hover:text-green-500">
+                  <div className="mt-8 text-center border-t pt-6">
+                    <p className="text-sm text-gray-600 mb-3">É cliente ou prestador?</p>
+                    <div className="flex space-x-3">
+                      <Link to="/register" className="text-blue-600 hover:text-blue-500 text-sm font-medium">
                         Cadastre-se como Cliente
-                      </Link>{' '}
-                      ou{' '}
-                      <Link to="/register-prestador" className="font-medium text-green-600 hover:text-green-500">
-                        Prestador de Serviços
                       </Link>
-                    </p>
+                      <span className="text-gray-400">•</span>
+                      <Link to="/register-prestador" className="text-purple-600 hover:text-purple-500 text-sm font-medium">
+                        Cadastre-se como Prestador
+                      </Link>
+                    </div>
                   </div>
                 </CardContent>
               </Card>

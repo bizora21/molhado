@@ -22,7 +22,7 @@ const Login = () => {
   const handleLogin = async (userType: string) => {
     setLoading(true);
     
-    console.log("Tentando login como:", userType, "com email:", formData.email);
+    console.log("🔐 Tentando login como:", userType, "com email:", formData.email);
     
     try {
       // 1. Verificar se o email foi preenchido
@@ -45,7 +45,7 @@ const Login = () => {
       });
 
       if (authError) {
-        console.error("Erro no signInWithPassword:", authError);
+        console.error("❌ Erro no signInWithPassword:", authError);
         
         // Mensagens de erro mais específicas
         if (authError.message.includes("Invalid login credentials")) {
@@ -60,10 +60,10 @@ const Login = () => {
         return;
       }
 
-      console.log("Login bem-sucedido:", authData.user);
+      console.log("✅ Login bem-sucedido:", authData.user);
 
       if (!authData.user) {
-        console.error("Usuário não encontrado nos dados de autenticação");
+        console.error("❌ Usuário não encontrado nos dados de autenticação");
         showError("Erro ao fazer login");
         setLoading(false);
         return;
@@ -72,40 +72,63 @@ const Login = () => {
       // 3. Buscar perfil do usuário
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
-        .select('user_type, full_name')
+        .select('*')
         .eq('user_id', authData.user.id)
         .single();
 
       if (profileError) {
-        console.error("Erro ao buscar perfil:", profileError);
-        showError("Erro ao carregar perfil do usuário");
-        setLoading(false);
-        return;
+        console.error("❌ Erro ao buscar perfil:", profileError);
+        
+        // Se não encontrar perfil, tentar criar um básico
+        if (profileError.code === 'PGRST116') {
+          console.log("⚠️ Perfil não encontrado, criando perfil básico...");
+          const basicProfile = {
+            user_id: authData.user.id,
+            full_name: authData.user.user_metadata?.full_name || authData.user.email?.split('@')[0] || 'Usuário',
+            phone: authData.user.user_metadata?.phone || '',
+            user_type: userType,
+            role: userType
+          };
+
+          const { data: newProfile, error: createError } = await supabase
+            .from('profiles')
+            .insert([basicProfile])
+            .select()
+            .single();
+
+          if (createError) {
+            console.error("❌ Erro ao criar perfil básico:", createError);
+            showError("Erro ao configurar seu perfil. Entre em contato com o suporte.");
+            setLoading(false);
+            return;
+          }
+
+          console.log("✅ Perfil básico criado:", newProfile);
+          profile = newProfile;
+        } else {
+          showError("Erro ao carregar seu perfil. Tente novamente.");
+          setLoading(false);
+          return;
+        }
       }
 
-      if (!profile) {
-        console.error("Perfil não encontrado");
-        showError("Perfil não encontrado. Entre em contato com o suporte.");
-        setLoading(false);
-        return;
-      }
+      console.log("✅ Perfil encontrado:", profile);
 
-      console.log("Perfil encontrado:", profile);
-
-      // 4. Verificar se o tipo de usuário selecionado corresponde ao perfil
-      if (userType !== profile.user_type) {
-        console.error("Tipo de usuário selecionado não corresponde ao perfil");
-        showError(`Este email está registrado como ${profile.user_type}, mas você selecionou ${userType}`);
+      // 4. Verificar se o tipo de usuário corresponde ao perfil
+      if (profile.user_type && profile.user_type !== userType) {
+        console.error("❌ Tipo de usuário selecionado não corresponde ao perfil");
+        showError(`Este email está registrado como ${profile.user_type}, mas você selecionou ${userType}.`);
         setLoading(false);
         return;
       }
 
       // 5. Login bem-sucedido
-      showSuccess(`Bem-vindo de volta, ${profile.full_name}!`);
+      const displayName = profile?.full_name || profile?.store_name || profile?.professional_name || 'Usuário';
+      showSuccess(`Bem-vindo de volta, ${displayName}!`);
       
       // 6. Redirecionar para o dashboard correto
       setTimeout(() => {
-        switch (profile.user_type) {
+        switch (userType) {
           case 'cliente':
             navigate('/cliente-dashboard');
             break;
@@ -121,7 +144,7 @@ const Login = () => {
       }, 1000);
 
     } catch (error) {
-      console.error("Erro geral no login:", error);
+      console.error("❌ Erro geral no login:", error);
       showError("Ocorreu um erro inesperado. Tente novamente.");
     } finally {
       setLoading(false);
@@ -141,25 +164,28 @@ const Login = () => {
       <header className="bg-white/80 backdrop-blur-sm border-b sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-8">
+            <div className="flex items-center space-x-4">
               <Link to="/" className="flex items-center space-x-2">
                 <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
                   <Store className="h-5 w-5 text-white" />
                 </div>
                 <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">LojaRapida</span>
               </Link>
-              <nav className="hidden lg:flex space-x-8">
+              <nav className="hidden md:flex space-x-6">
                 <Link to="/" className="text-gray-900 hover:text-blue-600 font-medium transition-colors">Início</Link>
-                <Link to="/produtos" className="text-gray-600 hover:text-blue-600 transition-colors">Produtos</Link>
-                <Link to="/servicos" className="text-gray-600 hover:text-blue-600 transition-colors">Serviços</Link>
-                <Link to="/blog" className="text-gray-600 hover:text-blue-600 transition-colors">Blog</Link>
+                <Link to="/produtos" className="text-gray-700 hover:text-blue-600 transition-colors">Produtos</Link>
+                <Link to="/servicos" className="text-gray-700 hover:text-blue-600 transition-colors">Serviços</Link>
+                <Link to="/blog" className="text-gray-700 hover:text-blue-600 transition-colors">Blog</Link>
               </nav>
             </div>
             
             <div className="flex items-center space-x-4">
-              <Link to="/register" className="text-blue-600 hover:text-blue-700 font-medium">
-                Não tem conta? Cadastre-se
-              </Link>
+              <div className="flex items-center space-x-2">
+                <span className="text-sm text-gray-600">Novo aqui?</span>
+                <Link to="/register" className="text-blue-600 hover:text-blue-700 font-medium">
+                  Cadastre-se
+                </Link>
+              </div>
             </div>
           </div>
         </div>
@@ -173,12 +199,12 @@ const Login = () => {
               <div>
                 <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-200 mb-4">Bem-vindo de volta</Badge>
                 <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
-                  Entre na maior comunidade de 
-                  <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"> compras</span> 
-                  <br />de Moçambique
+                  Entre na sua conta e 
+                  <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"> continue</span>
+                  <br />de onde parou
                 </h1>
                 <p className="text-xl text-gray-600 leading-relaxed">
-                  Acesse sua conta para continuar comprando dos melhores vendedores locais
+                  Acesse sua conta para gerenciar seus pedidos, produtos ou serviços
                 </p>
               </div>
 
@@ -206,7 +232,7 @@ const Login = () => {
 
               <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-6 text-white">
                 <h3 className="font-semibold text-lg mb-2">Novo na LojaRapida?</h3>
-                <p className="text-blue-100 mb-4">Junte-se a 100,000+ clientes satisfeitos</p>
+                <p className="text-blue-100 mb-4">Junte-se a 100,000+ usuários satisfeitos</p>
                 <Link to="/register">
                   <Button variant="secondary" className="bg-white text-blue-600 hover:bg-gray-100">
                     Criar Conta Gratuita
@@ -272,7 +298,7 @@ const Login = () => {
                               name="password"
                               type={showPassword ? "text" : "password"}
                               required
-                              placeholder="••••••••••"
+                              placeholder="•••••••••••"
                               value={formData.password}
                               onChange={handleInputChange}
                               className="h-12 pr-12"

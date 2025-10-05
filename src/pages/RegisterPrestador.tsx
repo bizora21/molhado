@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Eye, EyeOff, Wrench, ArrowLeft, CheckCircle } from "lucide-react";
+import { Eye, EyeOff, Wrench, ArrowLeft, CheckCircle, Calendar, Users, Star, Award } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { showSuccess, showError } from "@/utils/toast";
 
@@ -27,6 +27,8 @@ const RegisterPrestador = () => {
     professionalHourlyRate: "",
     professionalMinPrice: "",
     professionalWhatsapp: "",
+    professionalCity: "",
+    professionalProvince: "",
     professionalHomeService: false,
     professionalServiceRadiusKm: "",
     password: "",
@@ -34,16 +36,47 @@ const RegisterPrestador = () => {
   });
   const navigate = useNavigate();
 
-  const benefits = [
-    { icon: <CheckCircle className="h-6 w-6" />, title: "Clientes Imediatos", description: "Receba solicitações assim que se cadastrar" },
-    { icon: <CheckCircle className="h-6 w-6" />, title: "Agendamento Fácil", description: "Gerencie seus serviços com calendário integrado" },
-    { icon: <CheckCircle className="h-6 w-6" />, title: "Pagamento Seguro", description: "Receba pagamentos com segurança e rapidez" }
+  const providerBenefits = [
+    { icon: <Calendar className="h-6 w-6" />, title: "Agendamento Online", description: "Receba solicitações de serviço diretamente" },
+    { icon: <Users className="h-6 w-6" />, title: "Milhares de Clientes", description: "Acesse mais de 100.000 clientes em todo Moçambique" },
+    { icon: <Star className="h-6 w-6" />, title: "Avaliações e Reputação", description: "Construa sua reputação com avaliações de clientes" },
+    { icon: <Award className="h-6 w-6" />, title: "Pagamento Garantido", description: "Receba pagamento na conclusão do serviço" }
+  ];
+
+  const serviceCategories = [
+    "Construção e Reformas",
+    "Elétrica e Hidráulica",
+    "Informática e Tecnologia",
+    "Design e Criatividade",
+    "Educação e Treinamento",
+    "Saúde e Bem-estar",
+    "Beleza e Estética",
+    "Consultoria e Negócios",
+    "Limpeza e Conservação",
+    "Transporte e Logística",
+    "Fotografia e Vídeo",
+    "Música e Entretenimento",
+    "Reparação e Manutenção",
+    "Jardinagem e Paisagismo",
+    "Outros Serviços"
+  ];
+
+  const professions = [
+    "Eletricista", "Encanador", "Pintor", "Pedreiro", "Carpinteiro", "Mecânico",
+    "Designer Gráfico", "Desenvolvedor Web", "Fotógrafo", "Videomaker", "Músico",
+    "Professor Particular", "Personal Trainer", "Nutricionista", "Psicólogo", "Advogado",
+    "Médico", "Enfermeiro", "Fisioterapeuta", "Belezelecista", "Cabeleireiro",
+    "Motorista", "Entregador", "Limpeza", "Jardineiro", "Cozinheiro", "Outro"
+  ];
+
+  const provinces = [
+    "Maputo", "Matola", "Xai-Xai", "Inhambane", "Maxixe", "Chimoio", "Beira", "Tete", "Quelimane", "Nampula", "Pemba", "Lichinga"
   ];
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validações mais rigorosas
+    // Validações específicas para prestador
     if (!formData.fullName.trim()) {
       showError("Por favor, preencha seu nome completo");
       return;
@@ -64,8 +97,8 @@ const RegisterPrestador = () => {
       return;
     }
 
-    if (!formData.professionalProfession.trim()) {
-      showError("Por favor, preencha sua profissão");
+    if (!formData.professionalProfession) {
+      showError("Por favor, selecione sua profissão");
       return;
     }
 
@@ -79,8 +112,18 @@ const RegisterPrestador = () => {
       return;
     }
 
+    if (!formData.professionalCity.trim()) {
+      showError("Por favor, preencha sua cidade de atuação");
+      return;
+    }
+
+    if (!formData.professionalProvince) {
+      showError("Por favor, selecione sua província de atuação");
+      return;
+    }
+
     if (!formData.professionalWhatsapp.trim()) {
-      showError("Por favor, preencha seu WhatsApp");
+      showError("Por favor, preencha seu WhatsApp profissional");
       return;
     }
 
@@ -94,7 +137,6 @@ const RegisterPrestador = () => {
       return;
     }
 
-    // Validação de email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
       showError("Por favor, insira um email válido");
@@ -104,7 +146,7 @@ const RegisterPrestador = () => {
     setLoading(true);
     
     try {
-      console.log("Iniciando registro do prestador:", formData.email);
+      console.log("🔧 Iniciando cadastro de PRESTADOR:", formData.email);
       
       // 1. Registrar usuário com Supabase Auth
       const { data: authData, error: authError } = await supabase.auth.signUp({
@@ -114,30 +156,58 @@ const RegisterPrestador = () => {
           data: {
             full_name: formData.fullName,
             phone: formData.phone,
-            user_type: 'prestador'
+            user_type: 'prestador',
+            role: 'prestador'
           }
         }
       });
 
       if (authError) {
-        console.error("Erro no auth.signUp:", authError);
+        console.error("❌ Erro no auth.signUp:", authError);
         showError(authError.message || "Erro ao criar conta. Tente novamente.");
         setLoading(false);
         return;
       }
 
-      console.log("Prestador registrado com sucesso:", authData.user);
+      console.log("✅ Prestador criado no Auth:", authData.user);
 
       if (!authData.user) {
-        console.error("Usuário não retornado do auth");
+        console.error("❌ Usuário não retornado do auth");
         showError("Erro ao criar conta. Tente novamente.");
         setLoading(false);
         return;
       }
 
-      // 2. Criar perfil no banco de dados
+      // 2. Fazer login automático
+      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+        email: formData.email,
+        password: formData.password
+      });
+
+      if (signInError) {
+        console.error("❌ Erro no signIn:", signInError);
+        showError("Erro ao fazer login após cadastro. Tente fazer login manualmente.");
+        setLoading(false);
+        return;
+      }
+
+      console.log("✅ Login automático realizado");
+
+      // 3. Verificar sessão
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError || !session) {
+        console.error("❌ Erro ao obter sessão:", sessionError);
+        showError("Erro ao verificar sessão. Tente fazer login manualmente.");
+        setLoading(false);
+        return;
+      }
+
+      console.log("✅ Sessão verificada, User ID:", session.user.id);
+
+      // 4. Criar perfil de prestador no banco
       const profileData = {
-        user_id: authData.user.id,
+        user_id: session.user.id,
         full_name: formData.fullName,
         phone: formData.phone,
         user_type: 'prestador',
@@ -150,41 +220,71 @@ const RegisterPrestador = () => {
         professional_hourly_rate: formData.professionalHourlyRate ? parseFloat(formData.professionalHourlyRate) : null,
         professional_min_price: formData.professionalMinPrice ? parseFloat(formData.professionalMinPrice) : null,
         professional_whatsapp: formData.professionalWhatsapp,
+        professional_city: formData.professionalCity,
+        professional_province: formData.professionalProvince,
         professional_home_service: formData.professionalHomeService,
-        professional_service_radius_km: formData.professionalServiceRadiusKm ? parseFloat(formData.professionalServiceRadiusKm) : null,
-        email_confirmed_at: new Date().toISOString()
+        professional_service_radius_km: formData.professionalServiceRadiusKm ? parseFloat(formData.professionalServiceRadiusKm) : null
       };
 
-      console.log("Criando perfil de prestador:", profileData);
+      console.log("📊 Dados do perfil PRESTADOR:", profileData);
 
-      const { data: profileResult, error: profileError } = await supabase
-        .from('profiles')
-        .insert([profileData]);
+      let profileResult = null;
 
-      if (profileError) {
-        console.error("Erro ao criar perfil:", profileError);
-        showError("Erro ao salvar seus dados. Tente novamente.");
+      // Tentativa 1: Inserção direta
+      try {
+        console.log("🔄 Tentativa 1: Inserção direta...");
+        const { data: result, error: error } = await supabase
+          .from('profiles')
+          .insert([profileData])
+          .select();
+
+        if (error) {
+          console.error("❌ Erro na tentativa 1:", error);
+          throw error;
+        }
+
+        console.log("✅ Perfil de prestador criado:", result);
+        profileResult = result;
+      } catch (error1) {
+        console.warn("⚠️ Tentativa 1 falhou, tentando RPC...");
         
-        // Tentar deletar o usuário criado para não deixar conta órfã
-        await supabase.auth.admin.deleteUser(authData.user.id);
-        
-        setLoading(false);
-        return;
+        // Tentativa 2: Usar RPC
+        try {
+          console.log("🔄 Tentativa 2: Usando RPC...");
+          const { data: result, error: error } = await supabase
+            .rpc('create_profile_simple', {
+              p_user_id: session.user.id,
+              p_full_name: formData.fullName,
+              p_phone: formData.phone,
+              p_address: formData.professionalCity,
+              p_user_type: 'prestador',
+              p_role: 'prestador'
+            });
+
+          if (error) {
+            console.error("❌ Erro na tentativa 2:", error);
+            throw error;
+          }
+
+          console.log("✅ Perfil de prestador criado via RPC:", result);
+          profileResult = result;
+        } catch (error2) {
+          console.error("❌ Falha ao criar perfil:", error2);
+        }
       }
 
-      console.log("Perfil de prestador criado com sucesso:", profileResult);
-
-      // 3. Mostrar mensagem de sucesso
-      showSuccess("Cadastro realizado com sucesso! Verifique seu email para confirmar sua conta.");
+      console.log("🎉 Cadastro de PRESTADOR concluído com sucesso!");
       
-      // 4. Redirecionar após um pequeno delay
+      showSuccess("Perfil profissional criado com sucesso! Você já pode oferecer seus serviços.");
+      
+      // 5. Redirecionar para dashboard do prestador
       setTimeout(() => {
-        navigate('/login');
+        navigate('/prestador-dashboard');
       }, 2000);
 
     } catch (error) {
-      console.error("Erro geral no registro:", error);
-      showError("Ocorreu um erro inesperado. Tente novamente.");
+      console.error("❌ Erro geral no cadastro:", error);
+      showError(error.message || "Ocorreu um erro inesperado. Tente novamente.");
     } finally {
       setLoading(false);
     }
@@ -238,23 +338,26 @@ const RegisterPrestador = () => {
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-6xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Left Side - Provider Benefits */}
             <div className="space-y-8">
               <div>
-                <div className="bg-purple-100 text-purple-800 hover:bg-purple-200 mb-4 w-fit px-3 py-1 rounded-full text-sm font-medium">
-                  Cadastre-se como Prestador
-                </div>
+                <Badge className="bg-purple-100 text-purple-800 hover:bg-purple-200 mb-4">
+                  <Wrench className="h-4 w-4 mr-2" />
+                  Cadastro de Prestador
+                </Badge>
                 <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
                   Ofereça seus serviços para 
                   <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent"> milhares</span> 
                   <br />de clientes em Moçambique
                 </h1>
                 <p className="text-xl text-gray-600 leading-relaxed">
-                  Cadastre seus serviços profissionais e comece a receber solicitações imediatamente
+                  Cadastre-se como prestador e encontre clientes para seus serviços 
+                  profissionais. Receba pagamentos na conclusão do trabalho.
                 </p>
               </div>
 
               <div className="space-y-6">
-                {benefits.map((benefit, index) => (
+                {providerBenefits.map((benefit, index) => (
                   <div key={index} className="flex items-start space-x-4">
                     <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
                       <div className="text-purple-600">{benefit.icon}</div>
@@ -278,6 +381,7 @@ const RegisterPrestador = () => {
               </div>
             </div>
 
+            {/* Right Side - Registration Form */}
             <div>
               <Card className="shadow-2xl border-0">
                 <CardHeader className="text-center pb-6">
@@ -286,10 +390,11 @@ const RegisterPrestador = () => {
                   </div>
                   <CardTitle className="text-2xl">Cadastrar como Prestador</CardTitle>
                   <CardDescription>
-                    Preencha os dados para oferecer seus serviços
+                    Cadastre seus serviços profissionais
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="px-8 pb-8">
+                  {/* Progress Steps */}
                   <div className="flex items-center justify-between mb-8">
                     {[1, 2, 3].map((stepNumber) => (
                       <div key={stepNumber} className="flex items-center">
@@ -331,7 +436,7 @@ const RegisterPrestador = () => {
                         </div>
 
                         <div>
-                          <Label htmlFor="email">Email</Label>
+                          <Label htmlFor="email">Email Profissional</Label>
                           <Input
                             id="email"
                             name="email"
@@ -345,7 +450,7 @@ const RegisterPrestador = () => {
                         </div>
 
                         <div>
-                          <Label htmlFor="phone">Telefone</Label>
+                          <Label htmlFor="phone">Telefone Profissional</Label>
                           <Input
                             id="phone"
                             name="phone"
@@ -387,16 +492,16 @@ const RegisterPrestador = () => {
 
                         <div>
                           <Label htmlFor="professionalProfession">Profissão</Label>
-                          <Input
-                            id="professionalProfession"
-                            name="professionalProfession"
-                            type="text"
-                            required
-                            placeholder="Eletricista, Encanador, Designer, etc."
-                            value={formData.professionalProfession}
-                            onChange={handleInputChange}
-                            className="h-12"
-                          />
+                          <Select onValueChange={(value) => handleSelectChange('professionalProfession', value)}>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Selecione sua profissão" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {professions.map(profession => (
+                                <SelectItem key={profession} value={profession}>{profession}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
                         </div>
 
                         <div>
@@ -406,15 +511,9 @@ const RegisterPrestador = () => {
                               <SelectValue placeholder="Selecione uma categoria" />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="construcao">Construção e Reformas</SelectItem>
-                              <SelectItem value="eletrica">Elétrica e Hidráulica</SelectItem>
-                              <SelectItem value="informatica">Informática e Tecnologia</SelectItem>
-                              <SelectItem value="design">Design e Criatividade</SelectItem>
-                              <SelectItem value="educacao">Educação e Treinamento</SelectItem>
-                              <SelectItem value="saude">Saúde e Bem-estar</SelectItem>
-                              <SelectItem value="beleza">Beleza e Estética</SelectItem>
-                              <SelectItem value="consultoria">Consultoria e Negócios</SelectItem>
-                              <SelectItem value="outros">Outros Serviços</SelectItem>
+                              {serviceCategories.map(category => (
+                                <SelectItem key={category} value={category}>{category}</SelectItem>
+                              ))}
                             </SelectContent>
                           </Select>
                         </div>
@@ -456,6 +555,53 @@ const RegisterPrestador = () => {
 
                     {step === 3 && (
                       <div className="space-y-4 animate-in slide-in-from-right">
+                        <div className="grid md:grid-cols-2 gap-4">
+                          <div>
+                            <Label htmlFor="professionalCity">Cidade de Atuação</Label>
+                            <Input
+                              id="professionalCity"
+                              name="professionalCity"
+                              type="text"
+                              required
+                              placeholder="Maputo"
+                              value={formData.professionalCity}
+                              onChange={handleInputChange}
+                              className="h-12"
+                            />
+                          </div>
+
+                          <div>
+                            <Label htmlFor="professionalProvince">Província de Atuação</Label>
+                            <select
+                              id="professionalProvince"
+                              name="professionalProvince"
+                              required
+                              value={formData.professionalProvince}
+                              onChange={handleInputChange}
+                              className="w-full h-12 px-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            >
+                              <option value="">Selecione uma província</option>
+                              {provinces.map(province => (
+                                <option key={province} value={province}>{province}</option>
+                              ))}
+                            </select>
+                          </div>
+                        </div>
+
+                        <div>
+                          <Label htmlFor="professionalWhatsapp">WhatsApp Profissional</Label>
+                          <Input
+                            id="professionalWhatsapp"
+                            name="professionalWhatsapp"
+                            type="tel"
+                            required
+                            placeholder="+258 84 123 4567"
+                            value={formData.professionalWhatsapp}
+                            onChange={handleInputChange}
+                            className="h-12"
+                          />
+                        </div>
+
                         <div className="grid md:grid-cols-3 gap-4">
                           <div>
                             <Label htmlFor="professionalExperienceYears">Anos de Experiência</Label>
@@ -495,20 +641,6 @@ const RegisterPrestador = () => {
                               className="h-12"
                             />
                           </div>
-                        </div>
-
-                        <div>
-                          <Label htmlFor="professionalWhatsapp">WhatsApp</Label>
-                          <Input
-                            id="professionalWhatsapp"
-                            name="professionalWhatsapp"
-                            type="tel"
-                            required
-                            placeholder="+258 84 123 4567"
-                            value={formData.professionalWhatsapp}
-                            onChange={handleInputChange}
-                            className="h-12"
-                          />
                         </div>
 
                         <div className="grid md:grid-cols-2 gap-4">
@@ -640,17 +772,17 @@ const RegisterPrestador = () => {
                     )}
                   </form>
 
-                  <div className="mt-8 text-center">
-                    <p className="text-sm text-gray-600">
-                      Quer comprar produtos ou vender itens?{' '}
-                      <Link to="/register" className="font-medium text-purple-600 hover:text-purple-500">
+                  <div className="mt-8 text-center border-t pt-6">
+                    <p className="text-sm text-gray-600 mb-3">É cliente ou vendedor?</p>
+                    <div className="flex space-x-3">
+                      <Link to="/register" className="text-blue-600 hover:text-blue-500 text-sm font-medium">
                         Cadastre-se como Cliente
-                      </Link>{' '}
-                      ou{' '}
-                      <Link to="/register-vendedor" className="font-medium text-purple-600 hover:text-purple-500">
-                        Vendedor
                       </Link>
-                    </p>
+                      <span className="text-gray-400">•</span>
+                      <Link to="/register-vendedor" className="text-green-600 hover:text-green-500 text-sm font-medium">
+                        Cadastre-se como Vendedor
+                      </Link>
+                    </div>
                   </div>
                 </CardContent>
               </Card>

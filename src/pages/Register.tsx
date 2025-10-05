@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Eye, EyeOff, User, ArrowLeft, Check, Shield, Zap, Users, Store, Mail } from "lucide-react";
+import { Eye, EyeOff, User, ArrowLeft, Check, Shield, Zap, ShoppingBag, Home, Star } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { showSuccess, showError } from "@/utils/toast";
 
@@ -19,21 +19,28 @@ const Register = () => {
     email: "",
     phone: "",
     address: "",
+    city: "",
+    province: "",
     password: "",
     confirmPassword: "",
   });
   const navigate = useNavigate();
 
-  const benefits = [
-    { icon: <Shield className="h-6 w-6" />, title: "Compra Segura", description: "Transações protegidas com garantia" },
-    { icon: <Zap className="h-6 w-6" />, title: "Entrega Rápida", description: "Receba em até 48h" },
-    { icon: <Users className="h-6 w-6" />, title: "Suporte 24/7", description: "Ajuda sempre que precisar" }
+  const clientBenefits = [
+    { icon: <ShoppingBag className="h-6 w-6" />, title: "Compre com Segurança", description: "Pague somente na entrega do produto" },
+    { icon: <Shield className="h-6 w-6" />, title: "Garantia de Qualidade", description: "Todos os produtos verificados e aprovados" },
+    { icon: <Zap className="h-6 w-6" />, title: "Entrega Rápida", description: "Receba seus produtos em até 48h" },
+    { icon: <Star className="h-6 w-6" />, title: "Suporte Especial", description: "Atendimento dedicado para clientes" }
+  ];
+
+  const provinces = [
+    "Maputo", "Matola", "Xai-Xai", "Inhambane", "Maxixe", "Chimoio", "Beira", "Tete", "Quelimane", "Nampula", "Pemba", "Lichinga"
   ];
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validações mais rigorosas
+    // Validações específicas para cliente
     if (!formData.fullName.trim()) {
       showError("Por favor, preencha seu nome completo");
       return;
@@ -50,7 +57,17 @@ const Register = () => {
     }
 
     if (!formData.address.trim()) {
-      showError("Por favor, preencha seu endereço");
+      showError("Por favor, preencha seu endereço de entrega");
+      return;
+    }
+
+    if (!formData.city.trim()) {
+      showError("Por favor, preencha sua cidade");
+      return;
+    }
+
+    if (!formData.province) {
+      showError("Por favor, selecione sua província");
       return;
     }
 
@@ -64,7 +81,6 @@ const Register = () => {
       return;
     }
 
-    // Validação de email mais forte
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
       showError("Por favor, insira um email válido");
@@ -74,12 +90,9 @@ const Register = () => {
     setLoading(true);
     
     try {
-      console.log("🚀 Iniciando processo de registro completo...");
-      console.log("📧 Email:", formData.email);
-      console.log("👤 Nome:", formData.fullName);
+      console.log("🛒 Iniciando cadastro de CLIENTE:", formData.email);
       
       // 1. Registrar usuário com Supabase Auth
-      console.log("🔐 Passo 1: Criando usuário no Supabase Auth...");
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
@@ -88,6 +101,8 @@ const Register = () => {
             full_name: formData.fullName,
             phone: formData.phone,
             address: formData.address,
+            city: formData.city,
+            province: formData.province,
             user_type: 'cliente',
             role: 'cliente'
           }
@@ -101,7 +116,7 @@ const Register = () => {
         return;
       }
 
-      console.log("✅ Usuário criado no Auth:", authData.user);
+      console.log("✅ Cliente criado no Auth:", authData.user);
 
       if (!authData.user) {
         console.error("❌ Usuário não retornado do auth");
@@ -110,8 +125,7 @@ const Register = () => {
         return;
       }
 
-      // 2. Fazer login automático para obter sessão
-      console.log("🔐 Passo 2: Fazendo login automático...");
+      // 2. Fazer login automático
       const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
         email: formData.email,
         password: formData.password
@@ -126,8 +140,7 @@ const Register = () => {
 
       console.log("✅ Login automático realizado");
 
-      // 3. Verificar a sessão atual
-      console.log("🔐 Passo 3: Verificando sessão atual...");
+      // 3. Verificar sessão
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
       
       if (sessionError || !session) {
@@ -139,21 +152,20 @@ const Register = () => {
 
       console.log("✅ Sessão verificada, User ID:", session.user.id);
 
-      // 4. Criar perfil no banco de dados
-      console.log("📝 Passo 4: Criando perfil no banco de dados...");
-      
+      // 4. Criar perfil de cliente no banco
       const profileData = {
         user_id: session.user.id,
         full_name: formData.fullName,
         phone: formData.phone,
         address: formData.address,
+        city: formData.city,
+        province: formData.province,
         user_type: 'cliente',
         role: 'cliente'
       };
 
-      console.log("📊 Dados do perfil a ser inserido:", profileData);
+      console.log("📊 Dados do perfil CLIENTE:", profileData);
 
-      let profileCreated = false;
       let profileResult = null;
 
       // Tentativa 1: Inserção direta
@@ -169,15 +181,14 @@ const Register = () => {
           throw error;
         }
 
-        console.log("✅ Perfil criado na tentativa 1:", result);
+        console.log("✅ Perfil de cliente criado:", result);
         profileResult = result;
-        profileCreated = true;
       } catch (error1) {
         console.warn("⚠️ Tentativa 1 falhou, tentando RPC...");
         
         // Tentativa 2: Usar RPC
         try {
-          console.log("🔄 Tentativa 2: Usando RPC simples...");
+          console.log("🔄 Tentativa 2: Usando RPC...");
           const { data: result, error: error } = await supabase
             .rpc('create_profile_simple', {
               p_user_id: session.user.id,
@@ -193,29 +204,25 @@ const Register = () => {
             throw error;
           }
 
-          console.log("✅ Perfil criado via RPC:", result);
+          console.log("✅ Perfil de cliente criado via RPC:", result);
           profileResult = result;
-          profileCreated = true;
         } catch (error2) {
-          console.error("❌ Todas as tentativas falharam:", error2);
-          // Não vamos bloquear o registro por causa do perfil
-          profileCreated = false;
+          console.error("❌ Falha ao criar perfil:", error2);
+          // Continuar mesmo sem perfil para não bloquear o usuário
         }
       }
 
-      console.log("🎉 Processo de registro concluído com sucesso!");
-      console.log("📋 Perfil criado:", profileResult);
-
-      // 5. Mostrar mensagem de sucesso definitiva
-      showSuccess("Seu registro foi concluído com sucesso! Você já pode acessar o sistema.");
+      console.log("🎉 Cadastro de CLIENTE concluído com sucesso!");
       
-      // 6. Redirecionar após um pequeno delay
+      showSuccess("Conta de cliente criada com sucesso! Você já pode fazer compras.");
+      
+      // 5. Redirecionar para dashboard do cliente
       setTimeout(() => {
         navigate('/cliente-dashboard');
       }, 2000);
 
     } catch (error) {
-      console.error("❌ Erro geral no registro:", error);
+      console.error("❌ Erro geral no cadastro:", error);
       showError(error.message || "Ocorreu um erro inesperado. Tente novamente.");
     } finally {
       setLoading(false);
@@ -242,16 +249,16 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       {/* Header */}
       <header className="bg-white/80 backdrop-blur-sm border-b sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <Link to="/" className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                <Store className="h-5 w-5 text-white" />
+              <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center">
+                <ShoppingBag className="h-5 w-5 text-white" />
               </div>
-              <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">LojaRapida</span>
+              <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">LojaRapida</span>
             </Link>
             <Link to="/login" className="text-blue-600 hover:text-blue-700 font-medium">
               Já tem conta? Entrar
@@ -263,22 +270,26 @@ const Register = () => {
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-6xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
-            {/* Left Side - Benefits */}
+            {/* Left Side - Cliente Benefits */}
             <div className="space-y-8">
               <div>
-                <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-200 mb-4">Cadastre-se Grátis</Badge>
+                <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-200 mb-4">
+                  <ShoppingBag className="h-4 w-4 mr-2" />
+                  Cadastro de Cliente
+                </Badge>
                 <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
-                  Junte-se à maior comunidade de 
-                  <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"> compras</span> 
-                  <br />de Moçambique
+                  Compre dos melhores 
+                  <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent"> vendedores</span> 
+                  <br />com total segurança
                 </h1>
                 <p className="text-xl text-gray-600 leading-relaxed">
-                  Crie sua conta em menos de 2 minutos e comece a comprar dos melhores vendedores locais
+                  Cadastre-se como cliente e compre com pagamento na entrega. 
+                  Receba exatamente o que pediu ou não pague!
                 </p>
               </div>
 
               <div className="space-y-6">
-                {benefits.map((benefit, index) => (
+                {clientBenefits.map((benefit, index) => (
                   <div key={index} className="flex items-start space-x-4">
                     <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
                       <div className="text-blue-600">{benefit.icon}</div>
@@ -291,19 +302,13 @@ const Register = () => {
                 ))}
               </div>
 
-              <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-6 text-white">
+              <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-6 text-white">
                 <div className="flex items-center justify-between">
                   <div>
                     <h3 className="font-semibold text-lg mb-1">100,000+ Clientes</h3>
-                    <p className="text-blue-100">Confiam na LojaRapida</p>
+                    <p className="text-blue-100">Já compram com segurança</p>
                   </div>
-                  <div className="flex -space-x-2">
-                    {[1, 2, 3, 4].map((i) => (
-                      <div key={i} className="w-10 h-10 bg-white/20 rounded-full border-2 border-white flex items-center justify-center">
-                        <User className="h-5 w-5 text-white" />
-                      </div>
-                    ))}
-                  </div>
+                  <ShoppingBag className="h-12 w-12 text-white/50" />
                 </div>
               </div>
             </div>
@@ -312,12 +317,12 @@ const Register = () => {
             <div>
               <Card className="shadow-2xl border-0">
                 <CardHeader className="text-center pb-6">
-                  <div className="w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                    <User className="h-8 w-8 text-white" />
+                  <div className="w-16 h-16 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <ShoppingBag className="h-8 w-8 text-white" />
                   </div>
-                  <CardTitle className="text-2xl">Criar Conta</CardTitle>
+                  <CardTitle className="text-2xl">Criar Conta de Cliente</CardTitle>
                   <CardDescription>
-                    Preencha os dados abaixo para começar
+                    Cadastre-se para comprar com pagamento na entrega
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="px-8 pb-8">
@@ -327,7 +332,7 @@ const Register = () => {
                       <div key={stepNumber} className="flex items-center">
                         <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
                           step >= stepNumber 
-                            ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white' 
+                            ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white' 
                             : 'bg-gray-200 text-gray-500'
                         }`}>
                           {step > stepNumber ? (
@@ -338,7 +343,7 @@ const Register = () => {
                         </div>
                         {stepNumber < 3 && (
                           <div className={`w-full h-1 mx-2 ${
-                            step > stepNumber ? 'bg-gradient-to-r from-blue-600 to-purple-600' : 'bg-gray-200'
+                            step > stepNumber ? 'bg-gradient-to-r from-blue-600 to-indigo-600' : 'bg-gray-200'
                           }`} />
                         )}
                       </div>
@@ -379,7 +384,7 @@ const Register = () => {
                         <Button 
                           type="button" 
                           onClick={nextStep}
-                          className="w-full h-12 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                          className="w-full h-12 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
                         >
                           Continuar
                           <ArrowLeft className="h-4 w-4 ml-2 rotate-180" />
@@ -404,13 +409,13 @@ const Register = () => {
                         </div>
 
                         <div>
-                          <Label htmlFor="address">Endereço</Label>
+                          <Label htmlFor="address">Endereço de Entrega</Label>
                           <Input
                             id="address"
                             name="address"
                             type="text"
                             required
-                            placeholder="Av. Julius Nyerere, Maputo"
+                            placeholder="Av. Julius Nyerere, 1234"
                             value={formData.address}
                             onChange={handleInputChange}
                             className="h-12"
@@ -430,7 +435,7 @@ const Register = () => {
                           <Button 
                             type="button" 
                             onClick={nextStep}
-                            className="flex-1 h-12 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                            className="flex-1 h-12 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
                           >
                             Continuar
                             <ArrowLeft className="h-4 w-4 ml-2 rotate-180" />
@@ -441,6 +446,37 @@ const Register = () => {
 
                     {step === 3 && (
                       <div className="space-y-4 animate-in slide-in-from-right">
+                        <div>
+                          <Label htmlFor="city">Cidade</Label>
+                          <Input
+                            id="city"
+                            name="city"
+                            type="text"
+                            required
+                            placeholder="Maputo"
+                            value={formData.city}
+                            onChange={handleInputChange}
+                            className="h-12"
+                          />
+                        </div>
+
+                        <div>
+                          <Label htmlFor="province">Província</Label>
+                          <select
+                            id="province"
+                            name="province"
+                            required
+                            value={formData.province}
+                            onChange={handleInputChange}
+                            className="w-full h-12 px-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          >
+                            <option value="">Selecione uma província</option>
+                            {provinces.map(province => (
+                              <option key={province} value={province}>{province}</option>
+                            ))}
+                          </select>
+                        </div>
+
                         <div>
                           <Label htmlFor="password">Senha</Label>
                           <div className="relative">
@@ -531,7 +567,7 @@ const Register = () => {
                           </Button>
                           <Button 
                             type="submit" 
-                            className="flex-1 h-12 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                            className="flex-1 h-12 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
                             disabled={loading}
                           >
                             {loading ? (
@@ -540,7 +576,7 @@ const Register = () => {
                                 Cadastrando...
                               </>
                             ) : (
-                              "Criar Conta"
+                              "Criar Conta de Cliente"
                             )}
                           </Button>
                         </div>
@@ -548,17 +584,17 @@ const Register = () => {
                     )}
                   </form>
 
-                  <div className="mt-8 text-center">
-                    <p className="text-sm text-gray-600">
-                      Quer vender produtos ou oferecer serviços?{' '}
-                      <Link to="/register-vendedor" className="font-medium text-blue-600 hover:text-blue-500">
+                  <div className="mt-8 text-center border-t pt-6">
+                    <p className="text-sm text-gray-600 mb-3">É vendedor ou prestador?</p>
+                    <div className="flex space-x-3">
+                      <Link to="/register-vendedor" className="text-green-600 hover:text-green-500 text-sm font-medium">
                         Cadastre-se como Vendedor
-                      </Link>{' '}
-                      ou{' '}
-                      <Link to="/register-prestador" className="font-medium text-blue-600 hover:text-blue-500">
-                        Prestador de Serviços
                       </Link>
-                    </p>
+                      <span className="text-gray-400">•</span>
+                      <Link to="/register-prestador" className="text-purple-600 hover:text-purple-500 text-sm font-medium">
+                        Cadastre-se como Prestador
+                      </Link>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
