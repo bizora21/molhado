@@ -78,7 +78,7 @@ const Register = () => {
       console.log("📧 Email:", formData.email);
       console.log("👤 Nome:", formData.fullName);
       
-      // 1. Registrar usuário com Supabase Auth sem exigir confirmação de email
+      // 1. Registrar usuário com Supabase Auth
       console.log("🔐 Passo 1: Criando usuário no Supabase Auth...");
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: formData.email,
@@ -90,9 +90,7 @@ const Register = () => {
             address: formData.address,
             user_type: 'cliente',
             role: 'cliente'
-          },
-          // Não redirecionar - vamos fazer login automático
-          emailRedirectTo: undefined
+          }
         }
       });
 
@@ -141,7 +139,7 @@ const Register = () => {
 
       console.log("✅ Sessão verificada, User ID:", session.user.id);
 
-      // 4. Tentar criar perfil no banco de dados
+      // 4. Criar perfil no banco de dados
       console.log("📝 Passo 4: Criando perfil no banco de dados...");
       
       const profileData = {

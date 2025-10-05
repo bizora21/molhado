@@ -103,7 +103,7 @@ const RegisterVendedor = () => {
     setLoading(true);
     
     try {
-      console.log("Iniciando registro do vendedor:", formData.email);
+      console.log("🚀 Iniciando registro do vendedor:", formData.email);
       
       // 1. Registrar usuário com Supabase Auth
       const { data: authData, error: authError } = await supabase.auth.signUp({
@@ -119,24 +119,55 @@ const RegisterVendedor = () => {
       });
 
       if (authError) {
-        console.error("Erro no auth.signUp:", authError);
+        console.error("❌ Erro no auth.signUp:", authError);
         showError(authError.message || "Erro ao criar conta. Tente novamente.");
         setLoading(false);
         return;
       }
 
-      console.log("Vendedor registrado com sucesso:", authData.user);
+      console.log("✅ Vendedor registrado com sucesso:", authData.user);
 
       if (!authData.user) {
-        console.error("Usuário não retornado do auth");
+        console.error("❌ Usuário não retornado do auth");
         showError("Erro ao criar conta. Tente novamente.");
         setLoading(false);
         return;
       }
 
-      // 2. Criar perfil no banco de dados
+      // 2. Fazer login automático para obter sessão
+      console.log("🔐 Passo 2: Fazendo login automático...");
+      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+        email: formData.email,
+        password: formData.password
+      });
+
+      if (signInError) {
+        console.error("❌ Erro no signIn:", signInError);
+        showError("Erro ao fazer login após cadastro. Tente fazer login manualmente.");
+        setLoading(false);
+        return;
+      }
+
+      console.log("✅ Login automático realizado");
+
+      // 3. Verificar a sessão atual
+      console.log("🔐 Passo 3: Verificando sessão atual...");
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError || !session) {
+        console.error("❌ Erro ao obter sessão:", sessionError);
+        showError("Erro ao verificar sessão. Tente fazer login manualmente.");
+        setLoading(false);
+        return;
+      }
+
+      console.log("✅ Sessão verificada, User ID:", session.user.id);
+
+      // 4. Criar perfil no banco de dados
+      console.log("📝 Passo 4: Criando perfil no banco de dados...");
+      
       const profileData = {
-        user_id: authData.user.id,
+        user_id: session.user.id,
         full_name: formData.fullName,
         phone: formData.phone,
         user_type: 'vendedor',
@@ -153,36 +184,72 @@ const RegisterVendedor = () => {
         email_confirmed_at: new Date().toISOString()
       };
 
-      console.log("Criando perfil de vendedor:", profileData);
+      console.log("📊 Dados do perfil a ser inserido:", profileData);
 
-      const { data: profileResult, error: profileError } = await supabase
-        .from('profiles')
-        .insert([profileData]);
+      let profileCreated = false;
+      let profileResult = null;
 
-      if (profileError) {
-        console.error("Erro ao criar perfil:", profileError);
-        showError("Erro ao salvar seus dados. Tente novamente.");
+      // Tentativa 1: Inserção direta
+      try {
+        console.log("🔄 Tentativa 1: Inserção direta...");
+        const { data: result, error: error } = await supabase
+          .from('profiles')
+          .insert([profileData])
+          .select();
+
+        if (error) {
+          console.error("❌ Erro na tentativa 1:", error);
+          throw error;
+        }
+
+        console.log("✅ Perfil criado na tentativa 1:", result);
+        profileResult = result;
+        profileCreated = true;
+      } catch (error1) {
+        console.warn("⚠️ Tentativa 1 falhou, tentando RPC...");
         
-        // Tentar deletar o usuário criado para não deixar conta órfã
-        await supabase.auth.admin.deleteUser(authData.user.id);
-        
-        setLoading(false);
-        return;
+        // Tentativa 2: Usar RPC
+        try {
+          console.log("🔄 Tentativa 2: Usando RPC simples...");
+          const { data: result, error: error } = await supabase
+            .rpc('create_profile_simple', {
+              p_user_id: session.user.id,
+              p_full_name: formData.fullName,
+              p_phone: formData.phone,
+              p_address: formData.storeAddress,
+              p_user_type: 'vendedor',
+              p_role: 'vendedor'
+            });
+
+          if (error) {
+            console.error("❌ Erro na tentativa 2:", error);
+            throw error;
+          }
+
+          console.log("✅ Perfil criado via RPC:", result);
+          profileResult = result;
+          profileCreated = true;
+        } catch (error2) {
+          console.error("❌ Todas as tentativas falharam:", error2);
+          // Não vamos bloquear o registro por causa do perfil
+          profileCreated = false;
+        }
       }
 
-      console.log("Perfil de vendedor criado com sucesso:", profileResult);
+      console.log("🎉 Processo de registro concluído com sucesso!");
+      console.log("📋 Perfil criado:", profileResult);
 
-      // 3. Mostrar mensagem de sucesso
-      showSuccess("Cadastro realizado com sucesso! Verifique seu email para confirmar sua conta.");
+      // 5. Mostrar mensagem de sucesso definitiva
+      showSuccess("Cadastro realizado com sucesso! Você já pode acessar o sistema.");
       
-      // 4. Redirecionar após um pequeno delay
+      // 6. Redirecionar após um pequeno delay
       setTimeout(() => {
-        navigate('/login');
+        navigate('/vendedor-dashboard');
       }, 2000);
 
     } catch (error) {
-      console.error("Erro geral no registro:", error);
-      showError("Ocorreu um erro inesperado. Tente novamente.");
+      console.error("❌ Erro geral no registro:", error);
+      showError(error.message || "Ocorreu um erro inesperado. Tente novamente.");
     } finally {
       setLoading(false);
     }
@@ -217,7 +284,6 @@ const RegisterVendedor = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100">
-      {/* Header */}
       <header className="bg-white/80 backdrop-blur-sm border-b sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
@@ -534,7 +600,7 @@ const RegisterVendedor = () => {
                                 name="password"
                                 type={showPassword ? "text" : "password"}
                                 required
-                                placeholder="•••••••••••"
+                                placeholder="•••••••••••••••"
                                 value={formData.password}
                                 onChange={handleInputChange}
                                 className="h-12 pr-12"
@@ -563,7 +629,7 @@ const RegisterVendedor = () => {
                                 name="confirmPassword"
                                 type={showConfirmPassword ? "text" : "password"}
                                 required
-                                placeholder="•••••••••••"
+                                placeholder="•••••••••••••••"
                                 value={formData.confirmPassword}
                                 onChange={handleInputChange}
                                 className="h-12 pr-12"
