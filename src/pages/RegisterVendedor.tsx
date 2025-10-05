@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
 import { Eye, EyeOff, Store, ArrowLeft, Upload, CheckCircle, Package, TrendingUp, Users } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { showSuccess, showError } from "@/utils/toast";
@@ -336,10 +337,9 @@ const RegisterVendedor = () => {
             {/* Left Side - Seller Benefits */}
             <div className="space-y-8">
               <div>
-                <Badge className="bg-green-100 text-green-800 hover:bg-green-200 mb-4">
-                  <Store className="h-4 w-4 mr-2" />
+                <div className="bg-green-100 text-green-800 hover:bg-green-200 mb-4 w-fit px-3 py-1 rounded-full text-sm font-medium">
                   Cadastro de Vendedor
-                </Badge>
+                </div>
                 <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
                   Abra sua loja online e 
                   <span className="bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent"> alcance</span> 
@@ -660,7 +660,7 @@ const RegisterVendedor = () => {
                                 name="password"
                                 type={showPassword ? "text" : "password"}
                                 required
-                                placeholder="•••••••••••••••"
+                                placeholder="•••••••••••••••••"
                                 value={formData.password}
                                 onChange={handleInputChange}
                                 className="h-12 pr-12"
@@ -689,7 +689,7 @@ const RegisterVendedor = () => {
                                 name="confirmPassword"
                                 type={showConfirmPassword ? "text" : "password"}
                                 required
-                                placeholder="•••••••••••••••"
+                                placeholder="••••••••••••••••"
                                 value={formData.confirmPassword}
                                 onChange={handleInputChange}
                                 className="h-12 pr-12"

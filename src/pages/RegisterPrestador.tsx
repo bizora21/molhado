@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
 import { Eye, EyeOff, Wrench, ArrowLeft, CheckCircle, Calendar, Users, Star, Award } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { showSuccess, showError } from "@/utils/toast";
@@ -341,10 +342,9 @@ const RegisterPrestador = () => {
             {/* Left Side - Provider Benefits */}
             <div className="space-y-8">
               <div>
-                <Badge className="bg-purple-100 text-purple-800 hover:bg-purple-200 mb-4">
-                  <Wrench className="h-4 w-4 mr-2" />
+                <div className="bg-purple-100 text-purple-800 hover:bg-purple-200 mb-4 w-fit px-3 py-1 rounded-full text-sm font-medium">
                   Cadastro de Prestador
-                </Badge>
+                </div>
                 <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
                   Ofereça seus serviços para 
                   <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent"> milhares</span> 
@@ -679,7 +679,7 @@ const RegisterPrestador = () => {
                                 name="password"
                                 type={showPassword ? "text" : "password"}
                                 required
-                                placeholder="•••••••••••••••"
+                                placeholder="•••••••••••••••••••••"
                                 value={formData.password}
                                 onChange={handleInputChange}
                                 className="h-12 pr-12"
@@ -708,7 +708,7 @@ const RegisterPrestador = () => {
                                 name="confirmPassword"
                                 type={showConfirmPassword ? "text" : "password"}
                                 required
-                                placeholder="•••••••••••••••"
+                                placeholder="•••••••••••••••••••••"
                                 value={formData.confirmPassword}
                                 onChange={handleInputChange}
                                 className="h-12 pr-12"
