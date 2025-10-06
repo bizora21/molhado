@@ -1,0 +1,31 @@
+{
+  "name": "LojaRapida - Comércio Local de Moçambique",
+  "short_name": "LojaRapida",
+  "description": "A maior plataforma de e-commerce e serviços de Moçambique",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#3B82F6",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/lojarapida-logo-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/lojarapida-logo-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/favicon.ico",
+      "sizes": "32x32",
+      "type": "image/x-icon"
+    }
+  ],
+  "categories": ["shopping", "business", "lifestyle"],
+  "lang": "pt-MZ"
+}
